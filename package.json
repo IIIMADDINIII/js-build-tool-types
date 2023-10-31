@@ -13,5 +13,9 @@
   },
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool-types#readme",
   "main": "",
-  "types": "index.d.ts"
+  "types": "index.d.ts",
+  "peerDependencies": {
+    "typescript": ">=5.2.2",
+    "@types/node": ">=20.8.10"
+  }
 }
