@@ -1,6 +1,6 @@
 {
   "name": "@iiimaddiniii/js-build-tool-types",
-  "version": "0.4.1",
+  "version": "0.5.6",
   "description": "Global packages made available by the js-buid-tool",
   "repository": {
     "type": "git",
