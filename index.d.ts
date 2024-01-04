@@ -16,12 +16,19 @@ declare module "consts:testing" {
 
 declare module "@iiimaddiniii/js-build-tool" {
 
+  import type { promises } from 'fs';
   import { TaskFunction as TaskFunction_2 } from 'gulp';
   import { Buffer as Buffer_2 } from 'node:buffer';
   import { ChildProcess } from 'node:child_process';
   import { Readable, Stream, Writable } from 'node:stream';
   import type _typescript from 'typescript';
   import type { CompilerOptions, CompilerOptionsValue, CustomTransformers, Program, TsConfigSourceFile, TypeChecker } from 'typescript';
+
+  /**
+   * The path of this file.
+   * @public
+   */
+  const __dirname_2: string;
 
   type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
 
@@ -34,6 +41,11 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type AddonHooks = 'banner' | 'footer' | 'intro' | 'outro';
 
+  /**
+   * Adds an folder to the Path variable.
+   * @param folder - the folder which should be added to the path (should be absolute).
+   * @public
+   */
   function addToPath(folder: string): void;
 
   type AllRules = AtRule &
@@ -2746,6 +2758,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
+  /**
+   * The path of the executables (.bin) inside the temporary folder for the dlx operation.
+   * @public
+   */
+  const binPath: string;
+
   interface Block {
     /**
      * Require or disallow an empty line before the closing brace of blocks
@@ -4827,17 +4845,81 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type BufferEncodingOption = 'buffer' | null;
 
-  function build(configOpts?: ConfigOpts, commandOptions?: CommandOptions): () => Promise<void>;
+  /**
+   * Build the Project with an automatically generated rollup config.
+   * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+   * Can directly be used as an Rollup Task.
+   * @param configOpts - options on how the rollup config should be generated.
+   * @param commandOptions - optional cli flags for rollup.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function build(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
 
+  /**
+   * Build the Project with an automatically generated rollup config.
+   * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+   * @param configOpts - options on how the rollup config should be generated.
+   * @param commandOptions - optional cli flags for rollup.
+   * @returns Normalized version of the configOpts.
+   * @public
+   */
   function build_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
 
-  function buildAndRunTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): () => Promise<void>;
+  /**
+   * Build the Project with an automatically generated rollup config.
+   * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+   * Automatically sets the configOpts.buildTest option to true to build the test files.
+   * Runs Jest with the generated test files after the build finished.
+   * Can directly be used as an Rollup Task.
+   * @param configOpts - options on how the rollup config should be generated.
+   * @param commandOptions - optional cli flags for rollup.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function buildAndRunTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
 
+  /**
+   * Build the Project with an automatically generated rollup config.
+   * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+   * Automatically sets the configOpts.buildTest option to true to build the test files.
+   * Runs Jest with the generated test files after the build finished.
+   * @param configOpts - options on how the rollup config should be generated.
+   * @param commandOptions - optional cli flags for rollup.
+   * @returns Normalized version of the configOpts.
+   * @public
+   */
   function buildAndRunTests_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
 
-  function buildWithTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): () => Promise<void>;
+  /**
+   * Build the Project with an automatically generated rollup config.
+   * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+   * Automatically sets the configOpts.buildTest option to true to build the test files.
+   * Can directly be used as an Rollup Task.
+   * @param configOpts - options on how the rollup config should be generated.
+   * @param commandOptions - optional cli flags for rollup.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function buildWithTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
 
+  /**
+   * Build the Project with an automatically generated rollup config.
+   * Also bundles the declaration files with ApiExtractor and generate necessary package.json with module types.
+   * Automatically sets the configOpts.buildTest option to true to build the test files.
+   * @param configOpts - options on how the rollup config should be generated.
+   * @param commandOptions - optional cli flags for rollup.
+   * @returns Normalized version of the configOpts.
+   * @public
+   */
   function buildWithTests_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
+
+  /**
+   * Bundles the Declarations of an build and deletes them.
+   * @param defaultConfigOpts - Normalized ConfigOptions returned from build.
+   * @public
+   */
+  function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): Promise<void>;
 
   type ChangeEvent = 'create' | 'update' | 'delete';
 
@@ -4864,8 +4946,18 @@ declare module "@iiimaddiniii/js-build-tool" {
     usePolling?: boolean;
   }
 
-  function cleanWithGit(): () => Promise<void>;
+  /**
+   * Clean the Project folder with git (git -c core.longpaths=true clean -dfX).
+   * Can directly be used as an Rollup Task.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function cleanWithGit(): TaskFunction;
 
+  /**
+   * Clean the Project folder with git (git -c core.longpaths=true clean -dfX).
+   * @public
+   */
   function cleanWithGit_2(): Promise<void>;
 
   interface Color {
@@ -4995,8 +5087,20 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
+  /**
+   * Options wich are normally provided to rollup with cli flags.
+   * @public
+   */
   interface CommandOptions {
+    /**
+     * The build should fail if warnings are emitted.
+     * @default true
+     */
     failAfterWarnings?: boolean;
+    /**
+     * The build should be silent.
+     * @default false
+     */
     silent?: boolean;
   }
 
@@ -18737,11 +18841,53 @@ declare module "@iiimaddiniii/js-build-tool" {
     unused?: boolean;
   }
 
-  interface ConfigOpts extends ExportOpts {
+  /**
+   * Configuration Options on how to generate an Rollup Config.
+   * @public
+   */
+  export interface ConfigOpts extends ExportOpts {
+    /**
+     * A Glob Pattern defining wich files are Testfiles.
+     * @default "**\/*.test.?ts"
+     */
     testFileGlobPatterns?: string | string[];
+    /**
+     * BasePath of all source files (default = "./src/").
+     * @default "./src/"
+     */
     inputBasePath?: string;
+    /**
+     * A string[] or Map with Options overriding the automatically generated exports list.
+     * By default the exports of the package.json file are analyzed.
+     * @example
+     * <caption>example content of an package.json exports field:</caption>
+     * ```
+     * "exports": {
+     *   "./cli": {
+     *     "require": {
+     *       "types": "./dist/cli.d.cts",
+     *       "default": "./dist/cli.cjs"
+     *     }
+     *   },
+     *   ".": {
+     *     "import": {
+     *       "types": "./dist/index.d.ts",
+     *       "default": "./dist/index.js"
+     *     }
+     *   }
+     * },
+     * ```
+     */
     exports?: ExportsOpts;
+    /**
+     * A string[] or Map with Options overriding the automatically testfile list.
+     * By default all files wich match testFileGlobPatterns are added as tests.
+     */
     tests?: ExportsOpts;
+    /**
+     * A string[] or Map with Options with additional exports added manually.
+     * By default this list is empty.
+     */
     additionalExports?: ExportsOpts;
   }
 
@@ -18758,7 +18904,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type ConstsPluginOptions = {
+  /**
+   * Options for the Consts Rollup Plugin.
+   * @see {@link https://www.npmjs.com/package/rollup-plugin-consts | rollup-plugin-consts}
+   * @public
+   */
+  export type ConstsPluginOptions = {
     [name: string]: any;
   };
 
@@ -18862,6 +19013,10 @@ declare module "@iiimaddiniii/js-build-tool" {
     [stage in TransformerStage]?: Array<TransformerFactory<stage>>;
   };
 
+  /**
+   * Current working directory.
+   * @public
+   */
   const cwd: string;
 
   type DataType<T> = {
@@ -19184,75 +19339,338 @@ declare module "@iiimaddiniii/js-build-tool" {
     }
     | (ExistingDecodedSourceMap & { missing?: false; });
 
-  interface DefaultConfigOpts {
+  /**
+   * Normalized version of the ConfigOpts.
+   * Defines how the Rollup Config was generated.
+   * @public
+   */
+  export interface DefaultConfigOpts {
+    /**
+     * A Glob Pattern defining wich files are Testfiles.
+     */
     testFileGlobPatterns: string[];
+    /**
+     * BasePath of all source files.
+     */
     inputBasePath: string;
+    /**
+     * A Map of all automatically generated entrypoints to the application with its build options.
+     */
     exports: DefaultExportsOpts;
+    /**
+     * A Map of all testfiles with its build options.
+     */
     tests: DefaultExportsOpts;
+    /**
+     * A Map of all entrypoints wich were added manually with its build options.
+     */
     additionalExports: DefaultExportsOpts;
+    /**
+     * A Merged map of exports, tests and tests.
+     */
     entryPoints: DefaultExportsOpts;
   }
 
   type DefaultEncodingOption = 'utf8';
 
-  interface DefaultExportOpts {
+  /**
+   * Normalized Information on how an entrypoint was generated.
+   * @public
+   */
+  export interface DefaultExportOpts {
+    /**
+     * Where dose this code execute:
+     * "node" = Code is Executed by Node or similar environment.
+     * "browser" = Code is Executed by a Browser.
+     * @default "node"
+     */
     environment: ExecutionEnvironment;
+    /**
+     * What type of package is compiled:
+     * "app" = A standalone Application. It will be distributed as a whole (dependencies are bundled).
+     * "lib" = A library wich will be eventually be used by an Application (dependencies are not bundled).
+     * @default "lib"
+     */
     type: ExportType;
+    /**
+     * Is it in Production?
+     */
     prod: boolean;
+    /**
+     * Should the bundle be minified with terser?
+     * By default only Production Builds except test files are minified.
+     */
     minify: boolean;
+    /**
+     * Should declarations be generated?
+     * For Testfiles declarations are not generated, by default.
+     * If it is a library (type==="lib") or not in Production, declaration will be generated by default.
+     */
     generateDeclaration: boolean;
+    /**
+     * The directory where declarations should be emitted.
+     * @default "decl"
+     */
+    declarationDir: string;
+    /**
+     * Should the declarations of this entrypoint be bundled?
+     * @default true
+     */
+    bundleDeclarations: boolean;
+    /**
+     * Typescript Libraries to be used in all Projects.
+     * @default ["ESNext"]
+     */
     defaultLib: string[];
+    /**
+     * Typescript Libraries to be used with Browser Projects.
+     * @default ["DOM"]
+     */
     browserLib: string[];
+    /**
+     * Typescript Libraries to be used with Node Projects.
+     * @default []
+     */
     nodeLib: string[];
+    /**
+     * TsConfig file to be used with this export.
+     * By default "./tsconfig.json" will be used.
+     * Testfiles use "./tsconfig.test.json"
+     */
     tsconfig: string;
+    /**
+     * Tsbuildinfo filename for this entrypoint.
+     * needs to be different for each entrypoint else incremental builds don't work.
+     * By default it is generated based on inputFileName.
+     */
+    tsBuildInfoFileName: string;
+    /**
+     * Should sourcemaps be generated?
+     * By default sourcemaps are generated when not in Production (CI) or if it is a test.
+     */
     sourceMap: boolean;
+    /**
+     * How should the sourcemap be generated:
+     * "external" = A separate file with the Sourcemap is emitted.
+     * "inline" = The sourcemap is inlined in to the bundle.
+     * @default "external"
+     */
     sourceMapType: SourceMapType;
+    /**
+     * Additional dependencies wich should not be bundled (External dependencies).
+     * @default []
+     */
     externalDependencies: string[];
+    /**
+     * Additional packages wich should be blacklisted.
+     * @default []
+     */
     blacklistDependencies: string[];
+    /**
+     * Dev Dependencies wich are allowed even when blacklisting is on.
+     * @default []
+     */
     allowedDevDependencies: string[];
+    /**
+     * Dev Dependencies wich are allowed in test files.
+     * @default ["\@jest/globals"]
+     */
     testDependencies: string[];
+    /**
+     * Should the build fail, if dev dependencies are referenced in the bundle.
+     * @default true
+     */
     blacklistDevDependencies: boolean;
+    /**
+     * Filename to be used for the default export ".".
+     * @default "index"
+     */
     defaultExportName: string;
+    /**
+     * Base path of the source file.
+     * Will be the value of {@link ConfigOpts.inputBasePath} by default.
+     */
     inputFileDir: string;
+    /**
+     * Filepath of the sourcefile relative to the base path.
+     * By default it will use the path specified in the exports field in Package.json.
+     */
     inputFileName: string;
+    /**
+     * File extension of the source file.
+     * By default it will try to load .cts and .mts files first.
+     * If these files don't exist, it will use .ts
+     */
     inputFileExt: string;
+    /**
+     * Filepath to the entrypoint source.
+     */
+    inputFile: string;
+    /**
+     * If true, this is an entrypoint to a test file.
+     * @default false
+     */
     isTest: boolean;
+    /**
+     * Overrides the automatic detection if this entrypoint has multiple outputFormats.
+     */
     isSingleFormat: boolean;
+    /**
+     * Defines if testfiles should be build.
+     * @default false
+     */
     buildTest: boolean;
+    /**
+     * An Array of DefaultOutputsOpts each defining an bundle wich was emitted.
+     */
     outputs: DefaultOutputsOpts;
+    /**
+     * Overrides the array of Rollup Plugins to be used.
+     */
     plugins: Plugin[];
+    /**
+     * Overrides the Options of the terser plugin.
+     * @see {@link https://www.npmjs.com/package/@rollup/plugin-terser | @rollup/plugin-terser}
+     * @default {}
+     */
     terserPlugin: Options;
+    /**
+     * Overrides the Options of the manage dependencies plugin.
+     * @see {@link manageDependencies}
+     */
     manageDependenciesPlugin: ManageDependenciesConfig;
+    /**
+     * Overrides the Options of the consts plugin.
+     * @see {@link https://www.npmjs.com/package/rollup-plugin-consts | rollup-plugin-consts}
+     */
     constsPlugin: ConstsPluginOptions;
+    /**
+     * Overrides the Options of the json plugin.
+     * @see {@link https://www.npmjs.com/package/@rollup/plugin-json | @rollup/plugin-json}
+     * @default {}
+     */
     jsonPlugin: RollupJsonOptions;
+    /**
+     * Overrides the Options of the commonjs plugin.
+     * @see {@link https://www.npmjs.com/package/@rollup/plugin-commonjs | @rollup/plugin-commonjs}
+     * @default {}
+     */
     commonjsPlugin: RollupCommonJSOptions;
+    /**
+     * Overrides the Options of the typescript plugin.
+     * @see {@link https://www.npmjs.com/package/@rollup/plugin-typescript | @rollup/plugin-typescript}
+     */
     typescriptPlugin: RollupTypescriptOptions;
+    /**
+     * Overrides the Options of the source Maps plugin.
+     * @see {@link https://www.npmjs.com/package/rollup-plugin-include-sourcemaps | rollup-plugin-include-sourcemaps}
+     * @default {}
+     */
     sourceMapsPlugin: SourcemapsPluginOptions;
+    /**
+     * Overrides the Options of the node resolve plugin.
+     * @see {@link https://www.npmjs.com/package/@rollup/plugin-node-resolve | @rollup/plugin-node-resolve}
+     */
     nodeResolvePlugin: RollupNodeResolveOptions;
   }
 
-  type DefaultExportsOpts = {
+  /**
+   * A normalized Map of entrypoints with its build options.
+   * @public
+   */
+  export type DefaultExportsOpts = {
     [key: string]: DefaultExportOpts;
   };
 
   type DefaultIsModuleExportsOption = boolean | 'auto';
 
-  interface DefaultOutputOpts {
+  /**
+   * Options on how a Bundle was emitted.
+   * @public
+   */
+  export interface DefaultOutputOpts {
+    /**
+     * The base path directory where this output should be generated.
+     * By default it will use one of the cjsOutputDir, mjsOutputDir, singleOutputDir, testOutputDir values.
+     */
     outputFileDir: string;
+    /**
+     * Path of the file relative to the base path.
+     */
     outputFileName: string;
+    /**
+     * The File extension to use when emitting the bundle.
+     * By default it will use one of the cjsOutputExt, mjsOutputExt, singleOutputExt values.
+     * Testfiles will use .cjs ode .mjs based on the input file extension.
+     * Is the input file used .mts or .mjs it will take precedence over all other rules.
+     */
     outputFileExt: string;
+    /**
+     * Output format of this Bundle.
+     * If the Output Options are generated automatically, it will analyse the package.json type field and use that format.
+     * If the type field is undefined, it will generate both es and commonjs.
+     * .cts or .mts extensions take precedence over the package.json type field.
+     */
     outputFormat: OutputFormat;
+    /**
+     * The base path directory if multiple outputFormats are present and the format is commonjs.
+     * @default "./dist/cjs/"
+     */
     cjsOutputDir: string;
+    /**
+     * The base path directory if multiple outputFormats are present and the format is es.
+     * @default "./dist/esm/"
+     */
     mjsOutputDir: string;
+    /**
+     * The base path directory if only one outputFormat is present.
+     * @default "./dist/"
+     */
     singleOutputDir: string;
+    /**
+     * Extension of the output file if multiple outputFormats a present and the format is commonjs.
+     * @default ".js"
+     */
     cjsOutputExt: string;
+    /**
+     * Extension of the output file if multiple outputFormats a present and the format is es.
+     * @default ".js"
+     */
     mjsOutputExt: string;
+    /**
+     * Extension of the output file to be used, when only a single outputFormat is used.
+     * @default ".js"
+     */
     singleOutputExt: string;
+    /**
+     * The base path directory for tests to be emitted.
+     * @default "./tests/"
+     */
     testOutputDir: string;
+    /**
+     * Filepath to the generated output.
+     */
     file: string;
+    /**
+     * File path where the bundled declarations should be emitted.
+     */
+    declarationTarget: string;
+    /**
+     * Current location of the unbundled declaration file associated with this output.
+     */
+    declarationSource: string;
+    /**
+     * A list of packages wich should also be bundled in the declarations.
+     * @default []
+     */
+    bundleDeclarationPackages: string[];
   }
 
-  type DefaultOutputsOpts = DefaultOutputOpts[];
+  /**
+   * An Array of OutputOpts each defining an bundle wich was emitted.
+   * @public
+   */
+  export type DefaultOutputsOpts = DefaultOutputOpts[];
 
   /**
    * Dependencies are specified with a simple hash of package name to version range. The version range is a string which has one or more space-separated descriptors. Dependencies can also be identified with a tarball or git URL.
@@ -19261,15 +19679,89 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: string | undefined;
   }
 
+  /**
+   * The temporary project folder of the pnpm dlx operation.
+   * @public
+   */
   const dlxPath: string;
 
+  /**
+   * Downloads an Asset of a specific release token.
+   * @param options - options on how to get the release downloaded
+   * @public
+   */
   function downloadGithubRelease(options: DownloadGithubReleaseOptions): Promise<void>;
 
-  type DownloadGithubReleaseOptions = Parameters<typeof fetchReleaseByTag>[0];
+  /**
+   * Options for the downloadGithubRelease function.
+   * @public
+   */
+  interface DownloadGithubReleaseOptions {
+    /**
+     * The Owner of the repo.
+     */
+    owner: string;
+    /**
+     * The name of the repo.
+     */
+    repo: string;
+    /**
+     * The tag of the release.
+     */
+    tag: string;
+    /**
+     * Destination for the downloaded file.
+     */
+    destination: string;
+    /**
+     * should the file be extracted?
+     */
+    shouldExtract?: boolean;
+    /**
+     * Callback function to identify the right asset to download.
+     * @param version - version of the release.
+     * @param assets - additional information for the asset.
+     * @returns one entry of the assets array.
+     */
+    getAsset?: (version: string, assets: ReleaseAssets) => ReleaseAsset | undefined;
+  }
 
+  /**
+   * Download the latest github release of an repository.
+   * @param options - options on how to get the release downloaded
+   * @public
+   */
   function downloadLatestGithubRelease(options: DownloadLatestGithubReleaseOptions): Promise<void>;
 
-  type DownloadLatestGithubReleaseOptions = Parameters<typeof fetchLatestRelease>[0];
+  /**
+   * Options for the downloadLatestGithubRelease function.
+   * @public
+   */
+  interface DownloadLatestGithubReleaseOptions {
+    /**
+     * The Owner of the repo.
+     */
+    owner: string;
+    /**
+     * The name of the repo.
+     */
+    repo: string;
+    /**
+     * Destination for the downloaded file.
+     */
+    destination: string;
+    /**
+     * should the file be extracted?
+     */
+    shouldExtract?: boolean;
+    /**
+     * Callback function to identify the right asset to download.
+     * @param version - version of the release.
+     * @param assets - additional information for the asset.
+     * @returns one entry of the assets array.
+     */
+    getAsset?: (version: string, assets: ReleaseAssets) => ReleaseAsset | undefined;
+  }
 
   type ECMA = 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
 
@@ -23041,6 +23533,33 @@ declare module "@iiimaddiniii/js-build-tool" {
   type EnumCompilerOptions = 'module' | 'moduleResolution' | 'newLine' | 'jsx' | 'target';
 
   /**
+   * Options for customizing the sort order of {@link ApiEnum} members.
+   *
+   * @privateRemarks
+   * This enum is currently only used by the `@microsoft/api-extractor` package; it is declared here
+   * because we anticipate that if more options are added in the future, their sorting will be implemented
+   * by the `@microsoft/api-extractor-model` package.
+   *
+   * See https://github.com/microsoft/rushstack/issues/918 for details.
+   *
+   * @public
+   */
+  enum EnumMemberOrder {
+    /**
+     * `ApiEnumMember` items are sorted according to their {@link ApiItem.getSortKey}.  The order is
+     * basically alphabetical by identifier name, but otherwise unspecified to allow for cosmetic improvements.
+     *
+     * This is the default behavior.
+     */
+    ByName = "by-name",
+    /**
+     * `ApiEnumMember` items preserve the original order of the declarations in the source file.
+     * (This disables the automatic sorting that is normally applied based on {@link ApiItem.getSortKey}.)
+     */
+    Preserve = "preserve"
+  }
+
+  /**
    * An environment defines global variables that are predefined.
    */
   interface Env {
@@ -23154,6 +23673,19 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: string | undefined;
   }
 
+  /**
+   * Utility for executing Processes.
+   * It is a tag function for a template string.
+   * @param options - An  {@link https://github.com/sindresorhus/execa | EXECA object} specifying options on how to start the process.
+   * @example
+   *
+   * ```
+   * await exec`corepack prepare pnpm@${version} --activate`;
+   * await exec({ env: { GIT_ASK_YESNO: "false" } })`git -c core.longpaths=true clean -dfX`;
+   * await exec({ env: { NODE_OPTIONS: "--experimental-vm-modules" } })`jest ${testFiles.map((testFile) => testFile.replaceAll("\\", "/"))}`;
+   * ```
+   * @public
+   */
   const exec: Execa$<string>;
 
   type Execa$<StdoutStderrType extends StdoutStderrAll = string> = {
@@ -23431,7 +23963,13 @@ declare module "@iiimaddiniii/js-build-tool" {
   type ExecaSyncReturnValue<StdoutStderrType extends StdoutStderrAll = string> = {
   } & ExecaReturnBase<StdoutStderrType>;
 
-  type ExecutionEnvironment = "node" | "browser";
+  /**
+   * Where dose this code execute:
+   * "node" = Code is Executed by Node or similar environment.
+   * "browser" = Code is Executed by a Browser.
+   * @public
+   */
+  export type ExecutionEnvironment = "node" | "browser";
 
   interface ExistingDecodedSourceMap {
     file?: string;
@@ -23455,20 +23993,61 @@ declare module "@iiimaddiniii/js-build-tool" {
     x_google_ignoreList?: number[];
   }
 
-  function exit(): () => Promise<void>;
+  /**
+   * Exit the current process.
+   * Can directly be used as an Rollup Task.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function exit(): TaskFunction;
 
+  /**
+   * Exists the gulp task after all tasks finished in series.
+   * @param tasks - A list of task functions wich are executed in series.
+   * @returns
+   * @public
+   */
   function exitAfter(...tasks: TaskFunction[]): TaskFunction;
 
-  interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs">>, Partial<OutputOpts> {
+  /**
+   * Options on how to generate an entrypoint.
+   * @public
+   */
+  export interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs" | "inputFile" | "prod">>, Partial<OutputOpts> {
+    /**
+     * An callback function wich is called for each Entrypoint.
+     * Used to modify the Entrypoint Options and name before the config is normalized.
+     * If it returns undefined the entrypoint options are not changed.
+     * @param exportName - the Name of the Entrypoint
+     * @param options - the options for the current entrypoint
+     * @returns the New Entrypoint Options wich should be used or undefined. Can return a Promise.
+     */
     hookOptions?(exportName: string, options: ExportOpts): Promise<[string, ExportOpts] | undefined> | [string, ExportOpts] | undefined;
+    /**
+     * An Array of OutputOpts each defining an bundle to emit.
+     * Overrides the default outputs wich are generated.
+     * by default it will analyse the package.json type field and use that format.
+     * If the type field is undefined, it will generate both es and commonjs.
+     * .cts or .mts extensions take precedence over the package.json type field.
+     */
     outputs?: OutputsOpts;
   }
 
-  type ExportsOpts = string[] | {
+  /**
+   * A string[] or Map with Options with entrypoints.
+   * @public
+   */
+  export type ExportsOpts = string[] | {
     [key: string]: ExportOpts;
   };
 
-  type ExportType = "app" | "lib";
+  /**
+   * What type of package is compiled:
+   * "app" = A standalone Application. It will be distributed as a whole (dependencies are bundled).
+   * "lib" = A library wich will be eventually be used by an Application (dependencies are not bundled).
+   * @public
+   */
+  export type ExportType = "app" | "lib";
 
   interface Extensions {
     [k: string]: ("commonjs" | "module") | undefined;
@@ -23481,6 +24060,49 @@ declare module "@iiimaddiniii/js-build-tool" {
     | ((source: string, importer: string | undefined, isResolved: boolean) => boolean | NullValue);
 
   type ExtractOctokitResponse<R> = "responses" extends keyof R ? SuccessResponseDataType<R["responses"]> extends never ? RedirectResponseDataType<R["responses"]> extends never ? EmptyResponseDataType<R["responses"]> : RedirectResponseDataType<R["responses"]> : SuccessResponseDataType<R["responses"]> : unknown;
+
+  /**
+   * Used with {@link IConfigMessageReportingRule.logLevel} and {@link IExtractorInvokeOptions.messageCallback}.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  const enum ExtractorLogLevel {
+    /**
+     * The message will be displayed as an error.
+     *
+     * @remarks
+     * Errors typically cause the build to fail and return a nonzero exit code.
+     */
+    Error = "error",
+    /**
+     * The message will be displayed as an warning.
+     *
+     * @remarks
+     * Warnings typically cause a production build fail and return a nonzero exit code.  For a non-production build
+     * (e.g. using the `--local` option with `api-extractor run`), the warning is displayed but the build will not fail.
+     */
+    Warning = "warning",
+    /**
+     * The message will be displayed as an informational message.
+     *
+     * @remarks
+     * Informational messages may contain newlines to ensure nice formatting of the output,
+     * however word-wrapping is the responsibility of the message handler.
+     */
+    Info = "info",
+    /**
+     * The message will be displayed only when "verbose" output is requested, e.g. using the `--verbose`
+     * command line option.
+     */
+    Verbose = "verbose",
+    /**
+     * The message will be discarded entirely.
+     */
+    None = "none"
+  }
 
   type ExtractParameters<T> = "parameters" extends keyof T ? UnionToIntersection<{
     [K in keyof T["parameters"]]: T["parameters"][K];
@@ -23501,22 +24123,6 @@ declare module "@iiimaddiniii/js-build-tool" {
    */
   type Fetch = any;
 
-  /**
-   * Downloads and extract latest release from Github to the destination.
-   *
-   * await fetchLatestRelease({ owner: 'smallstep', repo: 'cli' })
-   */
-  function fetchLatestRelease(options: Omit<FetchReleaseOptions, 'getRelease'>): Promise<string[]>;
-
-  /**
-   * Downloads and extract release for the specified tag from Github to the destination.
-   *
-   * await fetchLatestRelease({ owner: 'smallstep', repo: 'cli', tag: '1.0.0' })
-   */
-  function fetchReleaseByTag(options: Omit<FetchReleaseOptions, 'getRelease'> & {
-    tag: string;
-  }): Promise<string[]>;
-
   interface FetchReleaseOptions extends RepoInfo {
     getRelease: (owner: string, repo: string) => Promise<OctokitRelease>;
     getAsset?: (version: string, assets: OctokitReleaseAssets) => OctokitReleaseAssets[number] | undefined;
@@ -23525,12 +24131,34 @@ declare module "@iiimaddiniii/js-build-tool" {
     shouldExtract?: boolean;
   }
 
+  /**
+   * returns the absolute path of a file in the project.
+   * @param relPath - path to the file relative to the project.
+   * @returns the absolute path of the file.
+   * @public
+   */
   function file(relPath: string): string;
 
   /**
    * A valid `picomatch` glob pattern, or array of patterns.
    */
   type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
+
+  /**
+   * Finds the temporary project folder of the pnpm dlx operation.
+   * @param packagePath - path inside the js-build-tool.
+   * @returns the upper most folder with node_modules inside.
+   * @public
+   */
+  function findDlxPath(packagePath: string): string;
+
+  /**
+   * Finds the path where js-build-tool was installed by pnpm.
+   * @param start - path inside the js-build-tool.
+   * @returns path to the folder named "js-build-tool".
+   * @public
+   */
+  function findJsBuildToolPath(start: string): string;
 
   type FirstPluginHooks =
     | 'load'
@@ -23753,6 +24381,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     wrap_iife?: boolean;
     wrap_func_args?: boolean;
   }
+
+  /**
+   * The NodeJs fs/promises module.
+   * @public
+   */
+  let fs: typeof promises;
 
   interface Function_2 {
     "function-blacklist"?: ArrayStringRule3;
@@ -24250,14 +24884,48 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type GetModuleInfo = (moduleId: string) => ModuleInfo | null;
 
-  function getPackageDependencies(): Promise<Dependency>;
+  /**
+   * Reads the Dependencies field of the project package.json file.
+   * @returns a Map of all dependencies.
+   * @public
+   */
+  function getProjectDependencies(): Promise<Dependency>;
 
-  function getPackageDevDependencies(): Promise<Dependency>;
+  /**
+   * Reads the DevDependencies field of the project package.json file.
+   * @returns a Map of all devDependencies.
+   * @public
+   */
+  function getProjectDevDependencies(): Promise<Dependency>;
 
-  function getPackageJson(cache?: boolean): Promise<JSONSchemaForNPMPackageJsonFiles>;
+  /**
+   * Reads the contents of a package.json of the project and caches it.
+   * @param cache - wether it should read the cached version (default = true).
+   * @returns the Object representing the content of the  project package.json file.
+   * @public
+   */
+  function getProjectPackageJson(cache?: boolean): Promise<JSONSchemaForNPMPackageJsonFiles>;
 
-  function getPackageType(): Promise<JSONSchemaForNPMPackageJsonFiles["type"]>;
+  /**
+   * Reads the type field of the project package.json file.
+   * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
+   * @public
+   */
+  function getProjectPackageType(): Promise<JSONSchemaForNPMPackageJsonFiles["type"]>;
 
+  /**
+   * Reads the exports field of the project package.json file and returns the top level export paths.
+   * @returns an string[] containing all top level exports.
+   * @public
+   */
+  function getProjectTopLevelExports(): Promise<string[]>;
+
+  /**
+   * Calculates the paths to the generated test files.
+   * @param defaultConfigOpts - Normalized ConfigOptions returned from build.
+   * @returns An Array of files wich includes the tests.
+   * @public
+   */
   function getTestFiles(defaultConfigOpts: DefaultConfigOpts): string[];
 
   /**
@@ -24268,6 +24936,18 @@ declare module "@iiimaddiniii/js-build-tool" {
   }
 
   type GlobalsOption = { [name: string]: string; } | ((name: string) => string);
+
+  /**
+   * The name of the gulpfile.
+   * @public
+   */
+  const gulpFileName = "gulpfile.mjs";
+
+  /**
+   * The path to the gulpfile.
+   * @public
+   */
+  const gulpFilePath: string;
 
   type HasModuleSideEffects = (id: string, external: boolean) => boolean;
 
@@ -24580,6 +25260,427 @@ declare module "@iiimaddiniii/js-build-tool" {
     exitCode?: number;
   }
 
+  /**
+   * Configures how the API report files (*.api.md) will be generated.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigApiReport {
+    /**
+     * Whether to generate an API report.
+     */
+    enabled: boolean;
+    /**
+     * The filename for the API report files.  It will be combined with `reportFolder` or `reportTempFolder` to produce
+     * a full output filename.
+     *
+     * @remarks
+     * The file extension should be ".api.md", and the string should not contain a path separator such as `\` or `/`.
+     */
+    reportFileName?: string;
+    /**
+     * Specifies the folder where the API report file is written.  The file name portion is determined by
+     * the `reportFileName` setting.
+     *
+     * @remarks
+     * The API report file is normally tracked by Git.  Changes to it can be used to trigger a branch policy,
+     * e.g. for an API review.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    reportFolder?: string;
+    /**
+     * Specifies the folder where the temporary report file is written.  The file name portion is determined by
+     * the `reportFileName` setting.
+     *
+     * @remarks
+     * After the temporary file is written to disk, it is compared with the file in the `reportFolder`.
+     * If they are different, a production build will fail.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    reportTempFolder?: string;
+    /**
+     * Whether "forgotten exports" should be included in the API report file.
+     *
+     * @remarks
+     * Forgotten exports are declarations flagged with `ae-forgotten-export` warnings. See
+     * https://api-extractor.com/pages/messages/ae-forgotten-export/ to learn more.
+     *
+     * @defaultValue `false`
+     */
+    includeForgottenExports?: boolean;
+  }
+
+  /**
+   * Determines how the TypeScript compiler engine will be invoked by API Extractor.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigCompiler {
+    /**
+     * Specifies the path to the tsconfig.json file to be used by API Extractor when analyzing the project.
+     *
+     * @remarks
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     *
+     * Note: This setting will be ignored if `overrideTsconfig` is used.
+     */
+    tsconfigFilePath?: string;
+    /**
+     * Provides a compiler configuration that will be used instead of reading the tsconfig.json file from disk.
+     *
+     * @remarks
+     * The value must conform to the TypeScript tsconfig schema:
+     *
+     * http://json.schemastore.org/tsconfig
+     *
+     * If omitted, then the tsconfig.json file will instead be read from the projectFolder.
+     */
+    overrideTsconfig?: {};
+    /**
+     * This option causes the compiler to be invoked with the `--skipLibCheck` option.
+     *
+     * @remarks
+     * This option is not recommended and may cause API Extractor to produce incomplete or incorrect declarations,
+     * but it may be required when dependencies contain declarations that are incompatible with the TypeScript engine
+     * that API Extractor uses for its analysis.  Where possible, the underlying issue should be fixed rather than
+     * relying on skipLibCheck.
+     */
+    skipLibCheck?: boolean;
+  }
+
+  /**
+   * Configures how the doc model file (*.api.json) will be generated.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigDocModel {
+    /**
+     * Whether to generate a doc model file.
+     */
+    enabled: boolean;
+    /**
+     * The output path for the doc model file.  The file extension should be ".api.json".
+     *
+     * @remarks
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    apiJsonFilePath?: string;
+    /**
+     * Whether "forgotten exports" should be included in the doc model file.
+     *
+     * @remarks
+     * Forgotten exports are declarations flagged with `ae-forgotten-export` warnings. See
+     * https://api-extractor.com/pages/messages/ae-forgotten-export/ to learn more.
+     *
+     * @defaultValue `false`
+     */
+    includeForgottenExports?: boolean;
+    /**
+     * The base URL where the project's source code can be viewed on a website such as GitHub or
+     * Azure DevOps. This URL path corresponds to the `<projectFolder>` path on disk.
+     *
+     * @remarks
+     * This URL is concatenated with the file paths serialized to the doc model to produce URL file paths to individual API items.
+     * For example, if the `projectFolderUrl` is "https://github.com/microsoft/rushstack/tree/main/apps/api-extractor" and an API
+     * item's file path is "api/ExtractorConfig.ts", the full URL file path would be
+     * "https://github.com/microsoft/rushstack/tree/main/apps/api-extractor/api/ExtractorConfig.js".
+     *
+     * Can be omitted if you don't need source code links in your API documentation reference.
+     */
+    projectFolderUrl?: string;
+  }
+
+  /**
+   * Configures how the .d.ts rollup file will be generated.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigDtsRollup {
+    /**
+     * Whether to generate the .d.ts rollup file.
+     */
+    enabled: boolean;
+    /**
+     * Specifies the output path for a .d.ts rollup file to be generated without any trimming.
+     *
+     * @remarks
+     * This file will include all declarations that are exported by the main entry point.
+     *
+     * If the path is an empty string, then this file will not be written.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    untrimmedFilePath?: string;
+    /**
+     * Specifies the output path for a .d.ts rollup file to be generated with trimming for an "alpha" release.
+     *
+     * @remarks
+     * This file will include only declarations that are marked as `@public`, `@beta`, or `@alpha`.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    alphaTrimmedFilePath?: string;
+    /**
+     * Specifies the output path for a .d.ts rollup file to be generated with trimming for a "beta" release.
+     *
+     * @remarks
+     * This file will include only declarations that are marked as `@public` or `@beta`.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    betaTrimmedFilePath?: string;
+    /**
+     * Specifies the output path for a .d.ts rollup file to be generated with trimming for a "public" release.
+     *
+     * @remarks
+     * This file will include only declarations that are marked as `@public`.
+     *
+     * If the path is an empty string, then this file will not be written.
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     */
+    publicTrimmedFilePath?: string;
+    /**
+     * When a declaration is trimmed, by default it will be replaced by a code comment such as
+     * "Excluded from this release type: exampleMember".  Set "omitTrimmingComments" to true to remove the
+     * declaration completely.
+     */
+    omitTrimmingComments?: boolean;
+  }
+
+  /**
+   * Configuration options for the API Extractor tool.  These options can be constructed programmatically
+   * or loaded from the api-extractor.json config file using the {@link ExtractorConfig} class.
+   *
+   * @public
+   */
+  interface IConfigFile {
+    /**
+     * Optionally specifies another JSON config file that this file extends from.  This provides a way for
+     * standard settings to be shared across multiple projects.
+     *
+     * @remarks
+     * If the path starts with `./` or `../`, the path is resolved relative to the folder of the file that contains
+     * the `extends` field.  Otherwise, the first path segment is interpreted as an NPM package name, and will be
+     * resolved using NodeJS `require()`.
+     */
+    extends?: string;
+    /**
+     * Determines the `<projectFolder>` token that can be used with other config file settings.  The project folder
+     * typically contains the tsconfig.json and package.json config files, but the path is user-defined.
+     *
+     * @remarks
+     *
+     * The path is resolved relative to the folder of the config file that contains the setting.
+     *
+     * The default value for `projectFolder` is the token `<lookup>`, which means the folder is determined using
+     * the following heuristics:
+     *
+     * If the config/rig.json system is used (as defined by {@link https://www.npmjs.com/package/@rushstack/rig-package
+     * | @rushstack/rig-package}), then the `<lookup>` value will be the package folder that referenced the rig.
+     *
+     * Otherwise, the `<lookup>` value is determined by traversing parent folders, starting from the folder containing
+     * api-extractor.json, and stopping at the first folder that contains a tsconfig.json file.  If a tsconfig.json file
+     * cannot be found in this way, then an error will be reported.
+     */
+    projectFolder?: string;
+    /**
+     * Specifies the .d.ts file to be used as the starting point for analysis.  API Extractor
+     * analyzes the symbols exported by this module.
+     *
+     * @remarks
+     *
+     * The file extension must be ".d.ts" and not ".ts".
+     * The path is resolved relative to the "projectFolder" location.
+     */
+    mainEntryPointFilePath: string;
+    /**
+     * A list of NPM package names whose exports should be treated as part of this package.
+     *
+     * @remarks
+     *
+     * For example, suppose that Webpack is used to generate a distributed bundle for the project `library1`,
+     * and another NPM package `library2` is embedded in this bundle.  Some types from `library2` may become part
+     * of the exported API for `library1`, but by default API Extractor would generate a .d.ts rollup that explicitly
+     * imports `library2`.  To avoid this, we can specify:
+     *
+     * ```js
+     *   "bundledPackages": [ "library2" ],
+     * ```
+     *
+     * This would direct API Extractor to embed those types directly in the .d.ts rollup, as if they had been
+     * local files for `library1`.
+     */
+    bundledPackages?: string[];
+    /**
+     * Specifies what type of newlines API Extractor should use when writing output files.
+     *
+     * @remarks
+     * By default, the output files will be written with Windows-style newlines.
+     * To use POSIX-style newlines, specify "lf" instead.
+     * To use the OS's default newline kind, specify "os".
+     */
+    newlineKind?: 'crlf' | 'lf' | 'os';
+    /**
+     * Set to true when invoking API Extractor's test harness.
+     * @remarks
+     * When `testMode` is true, the `toolVersion` field in the .api.json file is assigned an empty string
+     * to prevent spurious diffs in output files tracked for tests.
+     */
+    testMode?: boolean;
+    /**
+     * Specifies how API Extractor sorts members of an enum when generating the .api.json file.
+     *
+     * @remarks
+     * By default, the output files will be sorted alphabetically, which is "by-name".
+     * To keep the ordering in the source code, specify "preserve".
+     *
+     * @defaultValue `by-name`
+     */
+    enumMemberOrder?: EnumMemberOrder;
+    /**
+     * {@inheritDoc IConfigCompiler}
+     */
+    compiler?: IConfigCompiler;
+    /**
+     * {@inheritDoc IConfigApiReport}
+     */
+    apiReport?: IConfigApiReport;
+    /**
+     * {@inheritDoc IConfigDocModel}
+     */
+    docModel?: IConfigDocModel;
+    /**
+     * {@inheritDoc IConfigDtsRollup}
+     * @beta
+     */
+    dtsRollup?: IConfigDtsRollup;
+    /**
+     * {@inheritDoc IConfigTsdocMetadata}
+     * @beta
+     */
+    tsdocMetadata?: IConfigTsdocMetadata;
+    /**
+     * {@inheritDoc IExtractorMessagesConfig}
+     */
+    messages?: IExtractorMessagesConfig;
+  }
+
+  /**
+   * Configures reporting for a given message identifier.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigMessageReportingRule {
+    /**
+     * Specifies whether the message should be written to the the tool's output log.
+     *
+     * @remarks
+     * Note that the `addToApiReportFile` property may supersede this option.
+     */
+    logLevel: ExtractorLogLevel;
+    /**
+     * When `addToApiReportFile` is true:  If API Extractor is configured to write an API report file (.api.md),
+     * then the message will be written inside that file; otherwise, the message is instead logged according to
+     * the `logLevel` option.
+     */
+    addToApiReportFile?: boolean;
+  }
+
+  /**
+   * Specifies a table of reporting rules for different message identifiers, and also the default rule used for
+   * identifiers that do not appear in the table.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigMessageReportingTable {
+    /**
+     * The key is a message identifier for the associated type of message, or "default" to specify the default policy.
+     * For example, the key might be `TS2551` (a compiler message), `tsdoc-link-tag-unescaped-text` (a TSDOc message),
+     * or `ae-extra-release-tag` (a message related to the API Extractor analysis).
+     */
+    [messageId: string]: IConfigMessageReportingRule;
+  }
+
+  /**
+   * Configures how the tsdoc-metadata.json file will be generated.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IConfigTsdocMetadata {
+    /**
+     * Whether to generate the tsdoc-metadata.json file.
+     */
+    enabled: boolean;
+    /**
+     * Specifies where the TSDoc metadata file should be written.
+     *
+     * @remarks
+     * The path is resolved relative to the folder of the config file that contains the setting; to change this,
+     * prepend a folder token such as `<projectFolder>`.
+     *
+     * The default value is `<lookup>`, which causes the path to be automatically inferred from the `tsdocMetadata`,
+     * `typings` or `main` fields of the project's package.json.  If none of these fields are set, the lookup
+     * falls back to `tsdoc-metadata.json` in the package folder.
+     */
+    tsdocMetadataFilePath?: string;
+  }
+
+  /**
+   * Configures how API Extractor reports error and warning messages produced during analysis.
+   *
+   * @remarks
+   * This is part of the {@link IConfigFile} structure.
+   *
+   * @public
+   */
+  interface IExtractorMessagesConfig {
+    /**
+     * Configures handling of diagnostic messages generating the TypeScript compiler while analyzing the
+     * input .d.ts files.
+     */
+    compilerMessageReporting?: IConfigMessageReportingTable;
+    /**
+     * Configures handling of messages reported by API Extractor during its analysis.
+     */
+    extractorMessageReporting?: IConfigMessageReportingTable;
+    /**
+     * Configures handling of messages reported by the TSDoc parser when analyzing code comments.
+     */
+    tsdocMessageReporting?: IConfigMessageReportingTable;
+  }
+
   enum InlineFunctions {
     Disabled = 0,
     SimpleFunctions = 1,
@@ -24614,8 +25715,20 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type InputPluginOption = MaybePromise<Plugin | NullValue | false | InputPluginOption[]>;
 
-  function installDependencies(): () => Promise<void>;
+  /**
+   * Installs all dependencies of the package using pnpm.
+   * Will use the frozen lockfile in Production mode.
+   * Can directly be used as an Rollup Task.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function installDependencies(): TaskFunction;
 
+  /**
+   * Installs all dependencies of the package using pnpm.
+   * Will use the frozen lockfile in Production mode.
+   * @public
+   */
   function installDependencies_2(): Promise<void>;
 
   /**
@@ -24887,7 +26000,18 @@ declare module "@iiimaddiniii/js-build-tool" {
     isResolved: boolean
   ) => boolean;
 
+  /**
+   * Returns if it was run in production mode.
+   * @returns true when it is in production mode.
+   * @public
+   */
   function isProd(): boolean;
+
+  /**
+   * Path where the js-build-tool was installed.
+   * @public
+   */
+  const jsBuildToolPath: string;
 
   /** JSON representation of Typescript compiler options */
   type JsonCompilerOptions = Omit<FlexibleCompilerOptions, EnumCompilerOptions> &
@@ -25791,10 +26915,27 @@ declare module "@iiimaddiniii/js-build-tool" {
     ? (this: This, ...parameters: Arguments) => Return | Promise<Return>
     : never;
 
+  /**
+   * ManageDependencies Rollup Plugin for managing bundled dependencies.
+   * Either marks dependencies as External (are not bundled) or Blacklisted (Error when part of bundle).
+   * @param config - Object defining External/Blacklisted Packages/Paths.
+   * @returns Rollup Plugin Instance.
+   * @public
+   */
   function manageDependencies(config: ManageDependenciesConfig): Plugin;
 
+  /**
+   * Configuration Options for the ManageDependencies Rollup Plugin.
+   * @public
+   */
   interface ManageDependenciesConfig {
+    /**
+     * Array of Packages/Paths wich should not be bundled.
+     */
     external?: string[];
+    /**
+     * Array of Packages/Paths wich result in an Error when part of the bundle.
+     */
     blacklist?: string[];
   }
 
@@ -28619,6 +29760,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     "no-sync"?: number | ("off" | "warn" | "error") | unknown[];
     [k: string]: unknown | undefined;
   }
+
+  /**
+   * The node_modules folder inside the temporary project folder of the pnpm dlx operation.
+   * @public
+   */
+  const nodeModulesPath: string;
 
   type NormalizedAmdOptions = (
     | {
@@ -56484,7 +57631,13 @@ declare module "@iiimaddiniii/js-build-tool" {
     preliminaryFileName: string;
   }
 
-  type OutputFormat = "es" | "commonjs";
+  /**
+   * Output format for a bundle:
+   * "es" = ECMAScript Module syntax (mjs).
+   * "commonjs" = CommonJs Module Syntax (cjs).
+   * @public
+   */
+  export type OutputFormat = "es" | "commonjs";
 
   interface OutputOptions {
     amd?: AmdOptions;
@@ -56538,9 +57691,26 @@ declare module "@iiimaddiniii/js-build-tool" {
     validate?: boolean;
   }
 
-  interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file">> {
+  /**
+   * Options for how to generate
+   * @public
+   */
+  export interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file" | "declarationTarget" | "declarationSource">> {
+    /**
+     * An callback function wich is called for each Output.
+     * Used to modify the Output Options before the config is normalized.
+     * If it returns undefined the output options are not changed.
+     * @param options - the options for the current output
+     * @returns the New Output Options wich should be used or undefined. Can return a Promise.
+     */
     hookOutputOptions?(options: OutputOpts): Promise<OutputOpts | undefined> | OutputOpts | undefined;
+    /**
+     * The file name of the generated bundle.
+     */
     outputFileName: string;
+    /**
+     * What format the output should be (es or commenjs).
+     */
     outputFormat: OutputFormat;
   }
 
@@ -56573,7 +57743,11 @@ declare module "@iiimaddiniii/js-build-tool" {
     AlwaysOriginal = 3
   }
 
-  type OutputsOpts = OutputOpts[];
+  /**
+   * An Array of OutputOpts each defining an bundle wich should be emitted.
+   * @public
+   */
+  export type OutputsOpts = OutputOpts[];
 
   /**
    * Allows to override configuration for files and folders, specified by glob patterns
@@ -56623,8 +57797,6 @@ declare module "@iiimaddiniii/js-build-tool" {
     }[];
     [k: string]: unknown | undefined;
   }
-
-  const packageDir: string;
 
   type PackageExportsEntry = PackageExportsEntryPath | PackageExportsEntryObject;
 
@@ -56715,6 +57887,22 @@ declare module "@iiimaddiniii/js-build-tool" {
    */
   type PackageExportsFallback1 = PackageExportsEntry[];
 
+  /**
+   * The type of a package.json file.
+   * @public
+   */
+  type PackageJsonSchema = JSONSchemaForNPMPackageJsonFiles;
+
+  /**
+   * Takes a variable amount of strings (taskName) and/or functions (fn)
+   * and returns a function of the composed tasks or functions.
+   * Any taskNames are retrieved from the registry using the get method.
+   *
+   * When the returned function is executed, the tasks or functions will be executed in parallel,
+   * all being executed at the same time. If an error occurs, all execution will complete.
+   * @param tasks - list of tasks.
+   * @public
+   */
   const parallel: parallel_2;
 
   type ParallelPluginHooks = Exclude<
@@ -63496,8 +64684,20 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  function prepareWixTools(releaseTag?: string): () => Promise<void>;
+  /**
+   * Downloads the wixtoolset automatically and adds it to the path, so Electron Forge can use it.
+   * Can be directly used as an Gulp Task.
+   * @param releaseTag - wich release of the wixtoolset should be downloaded (undefined = latest).
+   * @returns A Gulp Task
+   * @public
+   */
+  function prepareWixTools(releaseTag?: string): TaskFunction;
 
+  /**
+   * Downloads the wixtoolset automatically and adds it to the path, so Electron Forge can use it.
+   * @param releaseTag - wich release of the wixtoolset should be downloaded (undefined = latest).
+   * @public
+   */
   function prepareWixTools_2(releaseTag?: string): Promise<void>;
 
   interface PreRenderedAsset {
@@ -63519,6 +64719,14 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type PreserveEntrySignaturesOption = false | 'strict' | 'allow-extension' | 'exports-only';
 
+  /**
+   * A combination of {@link setProd}, {@link selectPnpm} and {@link installDependencies}.
+   * Set Production mode and after installing pnpm installing all dependencies.
+   * Can directly be used as an Rollup Task.
+   * @param version - the version of pnpm to install (default = latest).
+   * @returns A Gulp Task.
+   * @public
+   */
   function prodSelectPnpmAndInstall(version?: string): TaskFunction;
 
   interface ProgramTransformerFactory<T extends TransformerStage> {
@@ -63526,6 +64734,18 @@ declare module "@iiimaddiniii/js-build-tool" {
 
     factory(program: Program): StagedTransformerFactory<T>;
   }
+
+  /**
+   * node_modules folder inside the project.
+   * @public
+   */
+  const projectNodeModulesPath: string;
+
+  /**
+   * Project folder (current working directory).
+   * @public
+   */
+  const projectPath: string;
 
   interface Property {
     "property-blacklist"?: ArrayStringRule6;
@@ -63575,9 +64795,29 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
+  /**
+   * Reads the content of a file in the project.
+   * @param relPath - path to the file relative to the project.
+   * @returns the content of the file.
+   * @public
+   */
   function read(relPath: string): Promise<string>;
 
+  /**
+   * Reads the content of a file in the project as json.
+   * @param relPath - path to the file relative to the project.
+   * @returns the parsed json data.
+   * @public
+   */
   function readJson(relPath: string): Promise<any>;
+
+  /**
+   * Reads the contents of a package.json file.
+   * @param path - path to the package.json file.
+   * @returns the Object representing the content of the package.json file.
+   * @public
+   */
+  function readPackageJson(path: string): Promise<JSONSchemaForNPMPackageJsonFiles>;
 
   type RedirectResponseDataType<Responses> = {
     [K in RedirectStatuses & keyof Responses]: OctokitResponse<unknown, K>;
@@ -63585,9 +64825,24 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type RedirectStatuses = 301 | 302;
 
+  /**
+   * Data of one of the Assets.
+   * @public
+   */
   type ReleaseAsset = ReleaseAssets[number];
 
+  /**
+   * A list of multiple Assets.
+   * @public
+   */
   type ReleaseAssets = Parameters<Required<FetchReleaseOptions>["getAsset"]>[1];
+
+  /**
+   * Reloads the fs module (maybe because it was monkey patched).
+   * @returns the just loaded fs/promises module.
+   * @public
+   */
+  function reloadFs(): typeof promises;
 
   type RenderChunkHook = (
     this: PluginContext,
@@ -63759,6 +65014,14 @@ declare module "@iiimaddiniii/js-build-tool" {
     property: string | null,
     options: { chunkId: string; format: InternalModuleFormat; moduleId: string; }
   ) => string | NullValue;
+
+  /**
+   * Resolves the absolute filepath of a module.
+   * @param module - name of the module to resolve.
+   * @returns
+   * @public
+   */
+  function resolveModule(module: string): string;
 
   type ResponseHeaders = {
     "cache-control"?: string;
@@ -67001,6 +68264,7 @@ declare module "@iiimaddiniii/js-build-tool" {
       plugins,
       tasks_2 as tasks,
       build_2 as build,
+      bundleDeclarations,
       buildWithTests_2 as buildWithTests,
       buildAndRunTests_2 as buildAndRunTests,
       getTestFiles,
@@ -67013,6 +68277,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   namespace rollup_2 {
     export {
       build_2 as build,
+      bundleDeclarations,
       buildWithTests_2 as buildWithTests,
       buildAndRunTests_2 as buildAndRunTests,
       getTestFiles,
@@ -67643,28 +68908,128 @@ declare module "@iiimaddiniii/js-build-tool" {
     EcmaScript6 &
     Legacy;
 
-  function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): () => Promise<void>;
+  /**
+   * Run Rollup with an custom configuration.
+   * Can directly be used as an Rollup Task.
+   * @param rollupOptions - Rollup Options wich normally are defined by the rollup.config.js.
+   * @param commandOptions - Options wich are normally provided through cli flags.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): TaskFunction;
 
+  /**
+   * Run Rollup with an custom configuration.
+   * @param rollupOptions - Rollup Options wich normally are defined by the rollup.config.js.
+   * @param commandOptions - Options wich are normally provided through cli flags.
+   * @public
+   */
   function run_2(rollupOptions?: RollupOptions[] | RollupOptions, commandOptions?: CommandOptions): Promise<void>;
 
-  function runScript(script: string, args?: string[]): () => Promise<void>;
+  /**
+   * Runs the {@link https://api-extractor.com/ | ApiExtractor}.
+   * Can directly be used as an Rollup Task.
+   * @param projectPackageJsonPath - path to the package.json file
+   * @param configObject - the {@link https://api.rushstack.io/pages/api-extractor.iextractorconfigprepareoptions/ | IExtractorConfigPrepareOptions} of the APIExtractor.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function runApiExtrator(projectPackageJsonPath: string, configObject: IConfigFile): TaskFunction;
 
+  /**
+   * Runs the {@link https://api-extractor.com/ | ApiExtractor}.
+   * @param projectPackageJsonPath - path to the package.json file
+   * @param options - the {@link https://api.rushstack.io/pages/api-extractor.iextractorconfigprepareoptions/ | IExtractorConfigPrepareOptions} of the APIExtractor.
+   * @public
+   */
+  function runApiExtrator_2(projectPackageJsonPath: string, options: IConfigFile): void;
+
+  /**
+   * Runs a pnpm script defined in the package.json file.
+   * Can directly be used as an Rollup Task.
+   * @param script - the name of the script to run.
+   * @param args - an Array of arguments for the script (default = []).
+   * @returns A Gulp Task.
+   * @public
+   */
+  function runScript(script: string, args?: string[]): TaskFunction;
+
+  /**
+   * Runs a pnpm script defined in the package.json file.
+   * @param script - the name of the script to run.
+   * @param args - an Array of arguments for the script (default = []).
+   * @public
+   */
   function runScript_2(script: string, args?: string[]): Promise<void>;
 
-  function runTestFiles(testFiles: string[]): () => Promise<void>;
+  /**
+   * Run the testfiles with jest.
+   * Can directly be used as an Rollup Task.
+   * @param testFiles - files wich should be executed as tests.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function runTestFiles(testFiles: string[]): TaskFunction;
 
+  /**
+   * Run the testfiles with jest.
+   * @param testFiles - files wich should be executed as tests.
+   * @public
+   */
   function runTestFiles_2(testFiles: string[]): Promise<void>;
 
-  function runTests(): () => Promise<void>;
+  /**
+   * Runs all testfiles from the jest config.
+   * Can directly be used as an Rollup Task.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function runTests(): TaskFunction;
 
+  /**
+   * Runs all testfiles from the jest config.
+   * @public
+   */
   function runTests_2(): Promise<void>;
 
-  function runWorkspaceScript(script: string, filter?: string, args?: string[]): () => Promise<void>;
+  /**
+   * Runs a script in one specific or all workspaces.
+   * Can directly be used as an Rollup Task.
+   * @param script - the name of the script to run.
+   * @param filter - a pnpm filter to specify in which workspaces to run the script (default = "*").
+   * @param args - an Array of arguments for the script (default = []).
+   * @returns A Gulp Task.
+   * @public
+   */
+  function runWorkspaceScript(script: string, filter?: string, args?: string[]): TaskFunction;
 
+  /**
+   * Runs a script in one specific or all workspaces.
+   * @param script - the name of the script to run.
+   * @param filter - a pnpm filter to specify in which workspaces to run the script (default = "*").
+   * @param args - an Array of arguments for the script (default = []).
+   * @public
+   */
   function runWorkspaceScript_2(script: string, filter?: string, args?: string[]): Promise<void>;
 
-  function runWorkspaceScriptParallel(script: string, filter?: string, args?: string[]): () => Promise<void>;
+  /**
+   * Runs a script in one specific or all workspaces in parallel.
+   * Can directly be used as an Rollup Task.
+   * @param script - the name of the script to run.
+   * @param filter - a pnpm filter to specify in which workspaces to run the script (default = "*").
+   * @param args - an Array of arguments for the script (default = []).
+   * @returns A Gulp Task.
+   * @public
+   */
+  function runWorkspaceScriptParallel(script: string, filter?: string, args?: string[]): TaskFunction;
 
+  /**
+   * Runs a script in one specific or all workspaces in parallel.
+   * @param script - the name of the script to run.
+   * @param filter - a pnpm filter to specify in which workspaces to run the script (default = "*").
+   * @param args - an Array of arguments for the script (default = []).
+   * @public
+   */
   function runWorkspaceScriptParallel_2(script: string, filter?: string, args?: string[]): Promise<void>;
 
   type SchemaForPrettierrc = (OptionsDefinition & OverridesDefinition) | string;
@@ -67999,10 +69364,30 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  function selectPnpm(version?: string): () => Promise<void>;
+  /**
+   * Install and activate pnpm.
+   * Can directly be used as an Rollup Task.
+   * @param version - the version of pnpm to install (default = latest).
+   * @returns A Gulp Task.
+   * @public
+   */
+  function selectPnpm(version?: string): TaskFunction;
 
+  /**
+   * Install and activate PNPM.
+   * @param version  - the version of pnpm to install (default = latest).
+   * @public
+   */
   function selectPnpm_2(version?: string): Promise<void>;
 
+  /**
+   * A combination of {@link selectPnpm} and {@link installDependencies}.
+   * Installs all dependencies after installing pnpm.
+   * Can directly be used as an Rollup Task.
+   * @param version - the version of pnpm to install (default = latest).
+   * @returns A Gulp Task.
+   * @public
+   */
   function selectPnpmAndInstall(version?: string): TaskFunction;
 
   interface SemanticReleaseSchema {
@@ -68050,12 +69435,41 @@ declare module "@iiimaddiniii/js-build-tool" {
     [key: string]: [number, any];
   }
 
+  /**
+   * Takes a variable amount of strings (taskName) and/or functions (fn)
+   * and returns a function of the composed tasks or functions.
+   * Any taskNames are retrieved from the registry using the get method.
+   *
+   * When the returned function is executed, the tasks or functions will be executed in series,
+   * each waiting for the prior to finish. If an error occurs, execution will stop.
+   * @param tasks - List of tasks.
+   * @public
+   */
   const series: series_2;
 
+  /**
+   * Helper function to set the displayname of minified functions.
+   * @param name - the name which should be applied to the task.
+   * @param task - the task (async function) which should receive the label.
+   * @returns the Taskfunktion with the displayName applied.
+   * @public
+   */
   function setDisplayName<T extends TaskFunction>(name: string, task: T): T;
 
-  function setProd(): () => Promise<void>;
+  /**
+   * Sets the environment to be Production.
+   * All Tasks from now run in Production mode.
+   * Can directly be used as an Rollup Task.
+   * @returns A Gulp Task.
+   * @public
+   */
+  function setProd(): TaskFunction;
 
+  /**
+   * Sets the environment to be Production.
+   * All Tasks from now run in Production mode.
+   * @public
+   */
   function setProd_2(): void;
 
   /**
@@ -68296,7 +69710,13 @@ declare module "@iiimaddiniii/js-build-tool" {
     readFile?(path: string, callback: (error: Error | null, data: Buffer | string) => void): void;
   }
 
-  type SourceMapType = "external" | "inline";
+  /**
+   * How should the sourcemap be generated:
+   * "external" = A separate file with the Sourcemap is emitted.
+   * "inline" = The sourcemap is inlined in to the bundle.
+   * @public
+   */
+  export type SourceMapType = "external" | "inline";
 
   interface SourceMapV3 {
     file?: string | null;
@@ -69114,8 +70534,18 @@ declare module "@iiimaddiniii/js-build-tool" {
 
   type StagedTransformerFactory<T extends TransformerStage> = ElementType<CustomTransformers[T]>;
 
-  function start(): () => Promise<void>;
+  /**
+   * Starts the electron app in the current folder (executes "pnpx electron .").
+   * Can be directly used as an Gulp Task.
+   * @returns A Gulp Task
+   * @public
+   */
+  function start(): TaskFunction;
 
+  /**
+   * Starts the electron app in the current folder (executes "pnpx electron .").
+   * @public
+   */
   function start_2(): Promise<void>;
 
   type StdioOption =
@@ -69328,6 +70758,58 @@ declare module "@iiimaddiniii/js-build-tool" {
       ) &
         unknown[])
     );
+
+  /**
+   * Create a stubPackages in the temporary directory of the dlx operation.
+   * @param options - options for how to create the stubPackage.
+   * @public
+   */
+  function stubPackage(options: StubPackageOptions): Promise<void>;
+
+  /**
+   * Options to create a stubPackage.
+   * @public
+   */
+  type StubPackageOptions = {
+    /**
+     * Location of the package for wich a stubPackage should be created.
+     */
+    location: string;
+  } & StubProjectPackageOptions;
+
+  /**
+   * Create multiple stubPackages in the temporary directory of the dlx operation.
+   * @param options - array of options for how to create the stubPackage.
+   * @public
+   */
+  function stubPackages(options: StubPackageOptions[]): Promise<void>;
+
+  /**
+   * Creates a stub Package in the temporary directory of the dlx operation, targeting a package prom the project.
+   * @param options - options on how the stubPackage should be created.
+   * @public
+   */
+  function stubProjectPackage(options: StubProjectPackageOptions): Promise<void>;
+
+  /**
+   * Options to create a stubPackage for a project dependency.
+   * @public
+   */
+  type StubProjectPackageOptions = {
+    /**
+     * Name of the package which is the destination of the stubPackage.
+     */
+    name: string;
+    /**
+     * Normally the package is resolved when the stubPackage is created.
+     * Set this to true do delay the resolving of the package to the time of requiring the stub.
+     */
+    resolveFromLocation?: boolean;
+    /**
+     * Subpath to also stub in the stubPackage.
+     */
+    subpaths?: string[];
+  };
 
   interface StylelintDisableComment {
     /**
@@ -69805,6 +71287,10 @@ declare module "@iiimaddiniii/js-build-tool" {
     | 'resolveFileUrl'
     | 'resolveImportMeta';
 
+  /**
+   * Type representing a Gulp Task.
+   * @public
+   */
   type TaskFunction = TaskFunction_2;
 
   namespace tasks {
@@ -69821,6 +71307,7 @@ declare module "@iiimaddiniii/js-build-tool" {
       exit,
       runTestFiles,
       runTests,
+      runApiExtrator,
       electron,
       tasks_2 as rollup
     };
@@ -69853,8 +71340,14 @@ declare module "@iiimaddiniii/js-build-tool" {
     export {
       electron_2 as electron,
       rollup_2 as rollup,
+      runApiExtrator_2 as runApiExtrator,
       exec,
       exitAfter,
+      reloadFs,
+      file,
+      read,
+      readJson,
+      fs,
       downloadLatestGithubRelease,
       downloadGithubRelease,
       ReleaseAssets,
@@ -69866,31 +71359,43 @@ declare module "@iiimaddiniii/js-build-tool" {
       TaskFunction,
       isProd,
       setProd_2 as setProd,
-      file,
-      read,
-      readJson,
       cleanWithGit_2 as cleanWithGit,
       setDisplayName,
       addToPath,
       runTestFiles_2 as runTestFiles,
       runTests_2 as runTests,
+      resolveModule,
+      readPackageJson,
+      getProjectPackageJson,
+      getProjectTopLevelExports,
+      getProjectDependencies,
+      getProjectDevDependencies,
+      getProjectPackageType,
+      PackageJsonSchema,
+      findDlxPath,
+      findJsBuildToolPath,
+      __dirname_2 as __dirname,
       dlxPath,
       cwd,
-      packageDir,
-      getPackageJson,
-      topLevelExports,
-      getPackageDependencies,
-      getPackageDevDependencies,
-      getPackageType,
+      projectPath,
+      projectNodeModulesPath,
+      gulpFileName,
+      gulpFilePath,
+      jsBuildToolPath,
+      nodeModulesPath,
+      binPath,
       selectPnpm_2 as selectPnpm,
       installDependencies_2 as installDependencies,
       runScript_2 as runScript,
       runWorkspaceScript_2 as runWorkspaceScript,
-      runWorkspaceScriptParallel_2 as runWorkspaceScriptParallel
+      runWorkspaceScriptParallel_2 as runWorkspaceScriptParallel,
+      stubProjectPackage,
+      stubPackages,
+      stubPackage,
+      StubProjectPackageOptions,
+      StubPackageOptions
     };
   }
-
-  function topLevelExports(): Promise<string[]>;
 
   class TraceMap implements SourceMap_2 {
     version: SourceMapV3['version'];
