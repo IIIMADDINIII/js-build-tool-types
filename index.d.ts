@@ -16,39 +16,96 @@ declare module "consts:testing" {
 
 declare module "@iiimaddiniii/js-build-tool" {
 
-  import type { promises } from 'fs';
+  import { SectionedSourceMapInput } from '@jridgewell/source-map';
+  import type { Node, Program } from 'estree';
+  import * as fs from 'fs/promises';
   import { TaskFunction as TaskFunction_2 } from 'gulp';
   import { Buffer as Buffer_2 } from 'node:buffer';
   import { ChildProcess } from 'node:child_process';
   import { Readable, Stream, Writable } from 'node:stream';
   import type _typescript from 'typescript';
-  import type { CompilerOptions, CompilerOptionsValue, CustomTransformers, Program, TsConfigSourceFile, TypeChecker } from 'typescript';
+  import type { CompilerOptions, CompilerOptionsValue, CustomTransformers, Program as Program_2, TsConfigSourceFile, TypeChecker } from 'typescript';
+
+  /**
+   Executes a command. The `command` string includes both the `file` and its `arguments`. Returns a `childProcess`.
+  
+   Arguments are automatically escaped. They can contain any character, but spaces must use `${}` like `` $`echo ${'has space'}` ``.
+  
+   This is the preferred method when executing multiple commands in a script file.
+  
+   The `command` string can inject any `${value}` with the following types: string, number, `childProcess` or an array of those types. For example: `` $`echo one ${'two'} ${3} ${['four', 'five']}` ``. For `${childProcess}`, the process's `stdout` is used.
+  
+   @returns An `ExecaChildProcess` that is both:
+        - a `Promise` resolving or rejecting with a `childProcessResult`.
+        - a [`child_process` instance](https://nodejs.org/api/child_process.html#child_process_class_childprocess) with some additional methods and properties.
+   @throws A `childProcessResult` error
+  
+   @example <caption>Basic</caption>
+   ```
+   import {$} from 'execa';
+  
+   const branch = await $`git branch --show-current`;
+   await $`dep deploy --branch=${branch}`;
+   ```
+  
+   @example <caption>Multiple arguments</caption>
+   ```
+   import {$} from 'execa';
+  
+   const args = ['unicorns', '&', 'rainbows!'];
+   const {stdout} = await $`echo ${args}`;
+   console.log(stdout);
+   //=> 'unicorns & rainbows!'
+   ```
+  
+   @example <caption>With options</caption>
+   ```
+   import {$} from 'execa';
+  
+   await $({stdio: 'inherit'})`echo unicorns`;
+   //=> 'unicorns'
+   ```
+  
+   @example <caption>Shared options</caption>
+   ```
+   import {$} from 'execa';
+  
+   const $$ = $({stdio: 'inherit'});
+  
+   await $$`echo unicorns`;
+   //=> 'unicorns'
+  
+   await $$`echo rainbows`;
+   //=> 'rainbows'
+   ```
+   */
+  declare const $: Execa$;
 
   /**
    * The path of this file.
    * @public
    */
-  const __dirname_2: string;
+  declare const __dirname_2: string;
 
-  type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
+  declare type AddonFunction = (chunk: RenderedChunk) => string | Promise<string>;
 
-  type AddonHook = string | AddonHookFunction;
+  declare type AddonHook = string | AddonHookFunction;
 
-  type AddonHookFunction = (
+  declare type AddonHookFunction = (
     this: PluginContext,
     chunk: RenderedChunk
   ) => string | Promise<string>;
 
-  type AddonHooks = 'banner' | 'footer' | 'intro' | 'outro';
+  declare type AddonHooks = 'banner' | 'footer' | 'intro' | 'outro';
 
   /**
    * Adds an folder to the Path variable.
    * @param folder - the folder which should be added to the path (should be absolute).
    * @public
    */
-  function addToPath(folder: string): void;
+  declare function addToPath(folder: string): void;
 
-  type AllRules = AtRule &
+  declare type AllRules = AtRule &
     Block &
     Color &
     Comment &
@@ -80,7 +137,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline after at-rule names
    */
-  type AlwaysMultiLineRule = (
+  declare type AlwaysMultiLineRule = (
     | null
     | ("always" | "always-multi-line" | [])
     | [
@@ -153,7 +210,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the colon of declarations
    */
-  type AlwaysMultiLineRule1 = (
+  declare type AlwaysMultiLineRule1 = (
     | null
     | ("always" | "always-multi-line" | [])
     | [
@@ -226,7 +283,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow whitespace on the inside of comment markers
    */
-  type AlwaysNeverRule = (
+  declare type AlwaysNeverRule = (
     | null
     | ("always" | "never" | [])
     | [
@@ -275,7 +332,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the bang of declarations
    */
-  type AlwaysNeverRule1 = (
+  declare type AlwaysNeverRule1 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -324,7 +381,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the colon in media features
    */
-  type AlwaysNeverRule10 = (
+  declare type AlwaysNeverRule10 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -373,7 +430,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace on the inside of the parentheses within media features
    */
-  type AlwaysNeverRule11 = (
+  declare type AlwaysNeverRule11 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -422,7 +479,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the range operator in media features
    */
-  type AlwaysNeverRule12 = (
+  declare type AlwaysNeverRule12 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -471,7 +528,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the range operator in media features
    */
-  type AlwaysNeverRule13 = (
+  declare type AlwaysNeverRule13 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -520,7 +577,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow a leading zero for fractional numbers less than 1
    */
-  type AlwaysNeverRule14 = (
+  declare type AlwaysNeverRule14 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -569,7 +626,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace on the inside of the brackets within attribute selector
    */
-  type AlwaysNeverRule15 = (
+  declare type AlwaysNeverRule15 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -618,7 +675,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after operators within attribute selectors
    */
-  type AlwaysNeverRule16 = (
+  declare type AlwaysNeverRule16 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -667,7 +724,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before operators within attribute selectors
    */
-  type AlwaysNeverRule17 = (
+  declare type AlwaysNeverRule17 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -716,7 +773,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow quotes for attribute values
    */
-  type AlwaysNeverRule18 = (
+  declare type AlwaysNeverRule18 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -765,7 +822,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the combinators of selectors
    */
-  type AlwaysNeverRule19 = (
+  declare type AlwaysNeverRule19 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -814,7 +871,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the bang of declarations
    */
-  type AlwaysNeverRule2 = (
+  declare type AlwaysNeverRule2 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -863,7 +920,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the combinators of selectors
    */
-  type AlwaysNeverRule20 = (
+  declare type AlwaysNeverRule20 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -912,7 +969,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace on the inside of the parentheses within pseudo-class selectors
    */
-  type AlwaysNeverRule21 = (
+  declare type AlwaysNeverRule21 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -961,7 +1018,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the colon of declarations
    */
-  type AlwaysNeverRule3 = (
+  declare type AlwaysNeverRule3 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1010,7 +1067,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow a trailing semicolon within declaration blocks
    */
-  type AlwaysNeverRule4 = (
+  declare type AlwaysNeverRule4 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1059,7 +1116,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow data URIs for urls
    */
-  type AlwaysNeverRule5 = (
+  declare type AlwaysNeverRule5 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1108,7 +1165,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow quotes for urls
    */
-  type AlwaysNeverRule6 = (
+  declare type AlwaysNeverRule6 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1157,7 +1214,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow whitespace after functions
    */
-  type AlwaysNeverRule7 = (
+  declare type AlwaysNeverRule7 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1206,7 +1263,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require or disallow Unicode BOM
    */
-  type AlwaysNeverRule8 = (
+  declare type AlwaysNeverRule8 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1255,7 +1312,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the colon in media features
    */
-  type AlwaysNeverRule9 = (
+  declare type AlwaysNeverRule9 = (
     | null
     | ("always" | "never" | [])
     | [
@@ -1301,7 +1358,7 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  type AmdOptions = (
+  declare type AmdOptions = (
     | {
       autoId?: false;
       id: string;
@@ -1323,39 +1380,39 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * An array of glob patterns to select test files. Files with an underscore prefix are ignored. By default only selects files with `cjs`, `mjs` & `js` extensions, even if the pattern matches other files. Specify `extensions` to allow other file extensions
    */
-  type ArrayOfPaths = string[];
+  declare type ArrayOfPaths = string[];
 
   /**
    * An array of glob patterns to match files that, even if changed, are ignored by the watcher
    */
-  type ArrayOfPaths1 = string[];
+  declare type ArrayOfPaths1 = string[];
 
   /**
    * Not typically useful in the `package.json` configuration, but equivalent to specifying `--match` on the CLI
    */
-  type ArrayOfPaths2 = string[];
+  declare type ArrayOfPaths2 = string[];
 
   /**
    * Extra modules to require before tests are run. Modules are required in the worker processes
    */
-  type ArrayOfPaths3 = string[];
+  declare type ArrayOfPaths3 = string[];
 
   /**
    * You can configure AVA to recognize additional file extensions as TypeScript (e.g., `["ts", "tsx"]` to add partial JSX support). Note that the preserve mode for JSX is not (yet) supported. See also AVA's `extensions` object
    */
-  type ArrayOfPaths4 = string[];
+  declare type ArrayOfPaths4 = string[];
 
-  type ArrayOfStrings = string[];
+  declare type ArrayOfStrings = string[];
 
   /**
    * Configure Node.js arguments used to launch worker processes
    */
-  type ArrayOfStrings1 = string[];
+  declare type ArrayOfStrings1 = string[];
 
   /**
    * Specify a blacklist of disallowed at-rules
    */
-  type ArrayStringRule = (
+  declare type ArrayStringRule = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1432,7 +1489,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed at-rules
    */
-  type ArrayStringRule1 = (
+  declare type ArrayStringRule1 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1509,7 +1566,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed pseudo-class selectors
    */
-  type ArrayStringRule10 = (
+  declare type ArrayStringRule10 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1586,7 +1643,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a blacklist of disallowed words within comments
    */
-  type ArrayStringRule2 = (
+  declare type ArrayStringRule2 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1663,7 +1720,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a blacklist of disallowed functions
    */
-  type ArrayStringRule3 = (
+  declare type ArrayStringRule3 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1740,7 +1797,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed url schemes
    */
-  type ArrayStringRule4 = (
+  declare type ArrayStringRule4 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1817,7 +1874,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed functions
    */
-  type ArrayStringRule5 = (
+  declare type ArrayStringRule5 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1894,7 +1951,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a blacklist of disallowed properties
    */
-  type ArrayStringRule6 = (
+  declare type ArrayStringRule6 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -1971,7 +2028,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed properties
    */
-  type ArrayStringRule7 = (
+  declare type ArrayStringRule7 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -2048,7 +2105,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a blacklist of disallowed attribute operators
    */
-  type ArrayStringRule8 = (
+  declare type ArrayStringRule8 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -2125,7 +2182,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed attribute operators
    */
-  type ArrayStringRule9 = (
+  declare type ArrayStringRule9 = (
     | (null | string)
     | [
       (([] | {}) | SimpleArrayStringRule | CoreRule) &
@@ -2199,15 +2256,16 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  interface AstNode {
+  declare type AstNode = RollupAstNode<Node>;
+
+  declare interface AstNodeLocation {
     end: number;
     start: number;
-    type: string;
   }
 
-  type AsyncPluginHooks = Exclude<keyof FunctionPluginHooks, SyncPluginHooks>;
+  declare type AsyncPluginHooks = Exclude<keyof FunctionPluginHooks, SyncPluginHooks>;
 
-  interface AtRule {
+  declare interface AtRule {
     "at-rule-blacklist"?: ArrayStringRule;
     /**
      * Require or disallow an empty line before at-rules
@@ -2419,7 +2477,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Configuration Schema for the JavaScript test runner AVA
    */
-  interface AVAConfigSchema {
+  declare interface AVAConfigSchema {
     files?: ArrayOfPaths;
     ignoredByWatcher?: ArrayOfPaths1;
     match?: ArrayOfPaths2;
@@ -2473,7 +2531,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     typescript?: Configuration;
   }
 
-  interface BestPractices {
+  declare interface BestPractices {
     /**
      * Enforce getter and setter pairs in objects
      */
@@ -2762,9 +2820,9 @@ declare module "@iiimaddiniii/js-build-tool" {
    * The path of the executables (.bin) inside the temporary folder for the dlx operation.
    * @public
    */
-  const binPath: string;
+  declare const binPath: string;
 
-  interface Block {
+  declare interface Block {
     /**
      * Require or disallow an empty line before the closing brace of blocks
      */
@@ -3158,7 +3216,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow vendor prefixes for at-rules
    */
-  type BooleanRule = (
+  declare type BooleanRule = (
     | null
     | (true | [])
     | [
@@ -3199,7 +3257,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow empty blocks
    */
-  type BooleanRule1 = (
+  declare type BooleanRule1 = (
     | null
     | (true | [])
     | [
@@ -3240,7 +3298,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow an unspaced operator within `calc` functions
    */
-  type BooleanRule10 = (
+  declare type BooleanRule10 = (
     | null
     | (true | [])
     | [
@@ -3281,7 +3339,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow direction values in `linear-gradient()` calls that are not valid according to the standard syntax
    */
-  type BooleanRule11 = (
+  declare type BooleanRule11 = (
     | null
     | (true | [])
     | [
@@ -3322,7 +3380,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow scheme-relative urls
    */
-  type BooleanRule12 = (
+  declare type BooleanRule12 = (
     | null
     | (true | [])
     | [
@@ -3363,7 +3421,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow selectors of lower specificity from coming after overriding selectors of higher specificity
    */
-  type BooleanRule13 = (
+  declare type BooleanRule13 = (
     | null
     | (true | [])
     | [
@@ -3404,7 +3462,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow duplicate selectors within a stylesheet
    */
-  type BooleanRule14 = (
+  declare type BooleanRule14 = (
     | null
     | (true | [])
     | [
@@ -3445,7 +3503,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow empty sources
    */
-  type BooleanRule15 = (
+  declare type BooleanRule15 = (
     | null
     | (true | [])
     | [
@@ -3486,7 +3544,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow extra semicolons
    */
-  type BooleanRule16 = (
+  declare type BooleanRule16 = (
     | null
     | (true | [])
     | [
@@ -3527,7 +3585,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow double-slash comments `(//...)` which are not supported by CSS and could lead to unexpected results
    */
-  type BooleanRule17 = (
+  declare type BooleanRule17 = (
     | null
     | (true | [])
     | [
@@ -3568,7 +3626,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow missing end-of-source newlines
    */
-  type BooleanRule18 = (
+  declare type BooleanRule18 = (
     | null
     | (true | [])
     | [
@@ -3609,7 +3667,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow animation names that do not correspond to a `@keyframes` declaration
    */
-  type BooleanRule19 = (
+  declare type BooleanRule19 = (
     | null
     | (true | [])
     | [
@@ -3650,7 +3708,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow single-line blocks
    */
-  type BooleanRule2 = (
+  declare type BooleanRule2 = (
     | null
     | (true | [])
     | [
@@ -3691,7 +3749,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow !important within keyframe declarations
    */
-  type BooleanRule20 = (
+  declare type BooleanRule20 = (
     | null
     | (true | [])
     | [
@@ -3732,7 +3790,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow units for zero lengths
    */
-  type BooleanRule21 = (
+  declare type BooleanRule21 = (
     | null
     | (true | [])
     | [
@@ -3773,7 +3831,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow vendor prefixes for media feature names
    */
-  type BooleanRule22 = (
+  declare type BooleanRule22 = (
     | null
     | (true | [])
     | [
@@ -3814,7 +3872,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow missing punctuation for non-boolean media features
    */
-  type BooleanRule23 = (
+  declare type BooleanRule23 = (
     | null
     | (true | [])
     | [
@@ -3855,7 +3913,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow trailing zeros in numbers
    */
-  type BooleanRule24 = (
+  declare type BooleanRule24 = (
     | null
     | (true | [])
     | [
@@ -3896,7 +3954,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow vendor prefixes for properties
    */
-  type BooleanRule25 = (
+  declare type BooleanRule25 = (
     | null
     | (true | [])
     | [
@@ -3937,7 +3995,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow standard properties inside `:root` rules
    */
-  type BooleanRule26 = (
+  declare type BooleanRule26 = (
     | null
     | (true | [])
     | [
@@ -3978,7 +4036,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow non-space characters for descendant combinators of selectors
    */
-  type BooleanRule27 = (
+  declare type BooleanRule27 = (
     | null
     | (true | [])
     | [
@@ -4019,7 +4077,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow attribute selectors
    */
-  type BooleanRule28 = (
+  declare type BooleanRule28 = (
     | null
     | (true | [])
     | [
@@ -4060,7 +4118,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow combinators in selectors
    */
-  type BooleanRule29 = (
+  declare type BooleanRule29 = (
     | null
     | (true | [])
     | [
@@ -4101,7 +4159,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow hex colors
    */
-  type BooleanRule3 = (
+  declare type BooleanRule3 = (
     | null
     | (true | [])
     | [
@@ -4142,7 +4200,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow id selectors
    */
-  type BooleanRule30 = (
+  declare type BooleanRule30 = (
     | null
     | (true | [])
     | [
@@ -4183,7 +4241,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow the universal selector
    */
-  type BooleanRule31 = (
+  declare type BooleanRule31 = (
     | null
     | (true | [])
     | [
@@ -4224,7 +4282,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow vendor prefixes for selectors
    */
-  type BooleanRule32 = (
+  declare type BooleanRule32 = (
     | null
     | (true | [])
     | [
@@ -4265,7 +4323,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow the composition of :root in selectors
    */
-  type BooleanRule33 = (
+  declare type BooleanRule33 = (
     | null
     | (true | [])
     | [
@@ -4306,7 +4364,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow redundant values in shorthand properties
    */
-  type BooleanRule34 = (
+  declare type BooleanRule34 = (
     | null
     | (true | [])
     | [
@@ -4347,7 +4405,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow (unescaped) newlines in strings
    */
-  type BooleanRule35 = (
+  declare type BooleanRule35 = (
     | null
     | (true | [])
     | [
@@ -4388,7 +4446,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow `animation` and `transition` less than or equal to 100ms
    */
-  type BooleanRule36 = (
+  declare type BooleanRule36 = (
     | null
     | (true | [])
     | [
@@ -4429,7 +4487,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow vendor prefixes for values
    */
-  type BooleanRule37 = (
+  declare type BooleanRule37 = (
     | null
     | (true | [])
     | [
@@ -4470,7 +4528,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Report stylelint-disable comments without a description.
    */
-  type BooleanRule38 = (
+  declare type BooleanRule38 = (
     | null
     | (true | [])
     | [
@@ -4511,7 +4569,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Report stylelint-disable comments that don't match rules that are specified in the configuration object.
    */
-  type BooleanRule39 = (
+  declare type BooleanRule39 = (
     | null
     | (true | [])
     | [
@@ -4552,7 +4610,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow invalid hex colors
    */
-  type BooleanRule4 = (
+  declare type BooleanRule4 = (
     | null
     | (true | [])
     | [
@@ -4593,7 +4651,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Report stylelint-disable comments that don't actually match any lints that need to be disabled
    */
-  type BooleanRule40 = (
+  declare type BooleanRule40 = (
     | null
     | (true | [])
     | [
@@ -4634,7 +4692,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow empty comments
    */
-  type BooleanRule5 = (
+  declare type BooleanRule5 = (
     | null
     | (true | [])
     | [
@@ -4675,7 +4733,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow custom properties outside of `:root` rules
    */
-  type BooleanRule6 = (
+  declare type BooleanRule6 = (
     | null
     | (true | [])
     | [
@@ -4716,7 +4774,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow `!important` within declarations
    */
-  type BooleanRule7 = (
+  declare type BooleanRule7 = (
     | null
     | (true | [])
     | [
@@ -4757,7 +4815,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow property values that are ignored due to another property value in the same rule
    */
-  type BooleanRule8 = (
+  declare type BooleanRule8 = (
     | null
     | (true | [])
     | [
@@ -4798,7 +4856,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Disallow shorthand properties that override related longhand properties
    */
-  type BooleanRule9 = (
+  declare type BooleanRule9 = (
     | null
     | (true | [])
     | [
@@ -4836,14 +4894,14 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  interface BranchObject {
+  declare interface BranchObject {
     name: string;
     channel?: string;
     range?: string;
     prerelease?: boolean | string;
   }
 
-  type BufferEncodingOption = 'buffer' | null;
+  declare type BufferEncodingOption = 'buffer' | null;
 
   /**
    * Build the Project with an automatically generated rollup config.
@@ -4854,7 +4912,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function build(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
+  declare function build(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
 
   /**
    * Build the Project with an automatically generated rollup config.
@@ -4864,7 +4922,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns Normalized version of the configOpts.
    * @public
    */
-  function build_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
+  declare function build_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
 
   /**
    * Build the Project with an automatically generated rollup config.
@@ -4877,7 +4935,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function buildAndRunTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
+  declare function buildAndRunTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
 
   /**
    * Build the Project with an automatically generated rollup config.
@@ -4889,7 +4947,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns Normalized version of the configOpts.
    * @public
    */
-  function buildAndRunTests_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
+  declare function buildAndRunTests_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
 
   /**
    * Build the Project with an automatically generated rollup config.
@@ -4901,7 +4959,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function buildWithTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
+  declare function buildWithTests(configOpts?: ConfigOpts, commandOptions?: CommandOptions): TaskFunction;
 
   /**
    * Build the Project with an automatically generated rollup config.
@@ -4912,18 +4970,18 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns Normalized version of the configOpts.
    * @public
    */
-  function buildWithTests_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
+  declare function buildWithTests_2(configOpts?: ConfigOpts, commandOptions?: CommandOptions): Promise<DefaultConfigOpts>;
 
   /**
    * Bundles the Declarations of an build and deletes them.
    * @param defaultConfigOpts - Normalized ConfigOptions returned from build.
    * @public
    */
-  function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): Promise<void>;
+  declare function bundleDeclarations(defaultConfigOpts: DefaultConfigOpts): Promise<void>;
 
-  type ChangeEvent = 'create' | 'update' | 'delete';
+  declare type ChangeEvent = 'create' | 'update' | 'delete';
 
-  interface ChokidarOptions {
+  declare interface ChokidarOptions {
     alwaysStat?: boolean;
     atomic?: boolean | number;
     awaitWriteFinish?:
@@ -4952,15 +5010,15 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function cleanWithGit(): TaskFunction;
+  declare function cleanWithGit(): TaskFunction;
 
   /**
    * Clean the Project folder with git (git -c core.longpaths=true clean -dfX).
    * @public
    */
-  function cleanWithGit_2(): Promise<void>;
+  declare function cleanWithGit_2(): Promise<void>;
 
-  interface Color {
+  declare interface Color {
     "color-hex-case"?: LowerUpperRule1;
     /**
      * Specify short or long notation for hex colors
@@ -5091,7 +5149,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Options wich are normally provided to rollup with cli flags.
    * @public
    */
-  interface CommandOptions {
+  declare interface CommandOptions {
     /**
      * The build should fail if warnings are emitted.
      * @default true
@@ -5104,7 +5162,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     silent?: boolean;
   }
 
-  interface Comment {
+  declare interface Comment {
     /**
      * Require or disallow an empty line before comments
      */
@@ -5159,11 +5217,11 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type CommonOptions<EncodingType extends EncodingOption = DefaultEncodingOption> = {
+  declare type CommonOptions<EncodingType extends EncodingOption = DefaultEncodingOption> = {
     /**
       Kill the spawned process when the parent process exits unless either:
-        - the spawned process is [`detached`](https://nodejs.org/api/child_process.html#child_process_options_detached)
-        - the parent process is terminated abruptly, for example, with `SIGKILL` as opposed to `SIGTERM` or a normal exit
+            - the spawned process is [`detached`](https://nodejs.org/api/child_process.html#child_process_options_detached)
+            - the parent process is terminated abruptly, for example, with `SIGKILL` as opposed to `SIGTERM` or a normal exit
 
       @default true
       */
@@ -5284,8 +5342,8 @@ declare module "@iiimaddiniii/js-build-tool" {
 
     /**
       Specify the kind of serialization used for sending messages between processes when using the `stdio: 'ipc'` option or `execaNode()`:
-        - `json`: Uses `JSON.stringify()` and `JSON.parse()`.
-        - `advanced`: Uses [`v8.serialize()`](https://nodejs.org/api/v8.html#v8_v8_serialize_value)
+            - `json`: Uses `JSON.stringify()` and `JSON.parse()`.
+            - `advanced`: Uses [`v8.serialize()`](https://nodejs.org/api/v8.html#v8_v8_serialize_value)
 
       [More info.](https://nodejs.org/api/child_process.html#child_process_advanced_serialization)
 
@@ -5363,14 +5421,14 @@ declare module "@iiimaddiniii/js-build-tool" {
       const subprocess = execa('node', [], {signal: abortController.signal});
 
       setTimeout(() => {
-        abortController.abort();
+            abortController.abort();
       }, 1000);
 
       try {
-        await subprocess;
+            await subprocess;
       } catch (error) {
-        console.log(subprocess.killed); // true
-        console.log(error.isCanceled); // true
+            console.log(subprocess.killed); // true
+            console.log(error.isCanceled); // true
       }
       ```
       */
@@ -5400,7 +5458,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     readonly verbose?: boolean;
   };
 
-  interface components {
+  declare interface components {
     schemas: {
       root: {
         /** Format: uri-template */
@@ -18784,7 +18842,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     };
   }
 
-  interface CompressOptions {
+  declare interface CompressOptions {
     arguments?: boolean;
     arrows?: boolean;
     booleans_as_integers?: boolean;
@@ -18845,7 +18903,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Configuration Options on how to generate an Rollup Config.
    * @public
    */
-  export interface ConfigOpts extends ExportOpts {
+  export declare interface ConfigOpts extends ExportOpts {
     /**
      * A Glob Pattern defining wich files are Testfiles.
      * @default "**\/*.test.?ts"
@@ -18894,7 +18952,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Configures @ava/typescript for projects that precompile TypeScript. Alternatively, you can use `ts-node` to do live testing without transpiling, in which case you shouldn't use the `typescript` property
    */
-  interface Configuration {
+  declare interface Configuration {
     extensions?: ArrayOfPaths4;
     rewritePaths?: Paths;
     /**
@@ -18909,11 +18967,11 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @see {@link https://www.npmjs.com/package/rollup-plugin-consts | rollup-plugin-consts}
    * @public
    */
-  export type ConstsPluginOptions = {
+  export declare type ConstsPluginOptions = {
     [name: string]: any;
   };
 
-  interface CoreRule {
+  declare interface CoreRule {
     disableFix?: boolean;
     /**
      * Custom message that will be used in errors and warnings
@@ -18927,7 +18985,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type CreateFilter = typeof createFilter;
+  declare type CreateFilter = typeof createFilter;
 
   /**
    * Constructs a filter function which can be used to determine whether or not
@@ -18940,22 +18998,22 @@ declare module "@iiimaddiniii/js-build-tool" {
    * If `false`, then the patterns will not be resolved against any directory.
    * This can be useful if you want to create a filter for virtual module names.
    */
-  function createFilter(
+  declare function createFilter(
     include?: FilterPattern,
     exclude?: FilterPattern,
     options?: { resolve?: string | false | null; }
   ): (id: string | unknown) => boolean;
 
-  interface CustomMedia {
+  declare interface CustomMedia {
     "custom-media-pattern"?: StringRule;
     [k: string]: unknown | undefined;
   }
 
-  interface CustomPluginOptions {
+  declare interface CustomPluginOptions {
     [plugin: string]: any;
   }
 
-  interface CustomProperty {
+  declare interface CustomProperty {
     /**
      * Require or disallow an empty line before custom properties
      */
@@ -19009,7 +19067,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type CustomTransformerFactories = {
+  declare type CustomTransformerFactories = {
     [stage in TransformerStage]?: Array<TransformerFactory<stage>>;
   };
 
@@ -19017,13 +19075,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Current working directory.
    * @public
    */
-  const cwd: string;
+  declare const cwd: string;
 
-  type DataType<T> = {
+  declare type DataType<T> = {
     [K in KnownJsonResponseTypes & keyof T]: T[K];
   }[KnownJsonResponseTypes & keyof T];
 
-  interface Declaration {
+  declare interface Declaration {
     "declaration-bang-space-after"?: AlwaysNeverRule1;
     "declaration-bang-space-before"?: AlwaysNeverRule2;
     "declaration-colon-newline-after"?: AlwaysMultiLineRule1;
@@ -19156,7 +19214,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface DeclarationBlock {
+  declare interface DeclarationBlock {
     /**
      * Disallow duplicate properties within declaration blocks
      */
@@ -19328,11 +19386,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface DecodedSourceMap extends SourceMapV3 {
-    mappings: SourceMapSegment_2[][];
-  }
-
-  type DecodedSourceMapOrMissing =
+  declare type DecodedSourceMapOrMissing =
     | {
       missing: true;
       plugin: string;
@@ -19344,7 +19398,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Defines how the Rollup Config was generated.
    * @public
    */
-  export interface DefaultConfigOpts {
+  export declare interface DefaultConfigOpts {
     /**
      * A Glob Pattern defining wich files are Testfiles.
      */
@@ -19371,13 +19425,13 @@ declare module "@iiimaddiniii/js-build-tool" {
     entryPoints: DefaultExportsOpts;
   }
 
-  type DefaultEncodingOption = 'utf8';
+  declare type DefaultEncodingOption = 'utf8';
 
   /**
    * Normalized Information on how an entrypoint was generated.
    * @public
    */
-  export interface DefaultExportOpts {
+  export declare interface DefaultExportOpts {
     /**
      * Where dose this code execute:
      * "node" = Code is Executed by Node or similar environment.
@@ -19434,10 +19488,15 @@ declare module "@iiimaddiniii/js-build-tool" {
     nodeLib: string[];
     /**
      * TsConfig file to be used with this export.
-     * By default "./tsconfig.json" will be used.
-     * Testfiles use "./tsconfig.test.json"
+     * @default "./tsconfig.json"
      */
     tsconfig: string;
+    /**
+     * The outDir typescript option.
+     * By Default it will use the "./dist/" folder.
+     * If it is a test it will use the "./tests/" folder.
+     */
+    tsOutDir: string;
     /**
      * Tsbuildinfo filename for this entrypoint.
      * needs to be different for each entrypoint else incremental builds don't work.
@@ -19451,9 +19510,8 @@ declare module "@iiimaddiniii/js-build-tool" {
     sourceMap: boolean;
     /**
      * How should the sourcemap be generated:
-     * "external" = A separate file with the Sourcemap is emitted.
-     * "inline" = The sourcemap is inlined in to the bundle.
-     * @default "external"
+     * "external" = A separate file with the Sourcemap is emitted (default).
+     * "inline" = The sourcemap is inlined in to the bundle (default for tests only).
      */
     sourceMapType: SourceMapType;
     /**
@@ -19578,17 +19636,17 @@ declare module "@iiimaddiniii/js-build-tool" {
    * A normalized Map of entrypoints with its build options.
    * @public
    */
-  export type DefaultExportsOpts = {
+  export declare type DefaultExportsOpts = {
     [key: string]: DefaultExportOpts;
   };
 
-  type DefaultIsModuleExportsOption = boolean | 'auto';
+  declare type DefaultIsModuleExportsOption = boolean | 'auto';
 
   /**
    * Options on how a Bundle was emitted.
    * @public
    */
-  export interface DefaultOutputOpts {
+  export declare interface DefaultOutputOpts {
     /**
      * The base path directory where this output should be generated.
      * By default it will use one of the cjsOutputDir, mjsOutputDir, singleOutputDir, testOutputDir values.
@@ -19670,12 +19728,12 @@ declare module "@iiimaddiniii/js-build-tool" {
    * An Array of OutputOpts each defining an bundle wich was emitted.
    * @public
    */
-  export type DefaultOutputsOpts = DefaultOutputOpts[];
+  export declare type DefaultOutputsOpts = DefaultOutputOpts[];
 
   /**
    * Dependencies are specified with a simple hash of package name to version range. The version range is a string which has one or more space-separated descriptors. Dependencies can also be identified with a tarball or git URL.
    */
-  interface Dependency {
+  declare interface Dependency {
     [k: string]: string | undefined;
   }
 
@@ -19683,20 +19741,20 @@ declare module "@iiimaddiniii/js-build-tool" {
    * The temporary project folder of the pnpm dlx operation.
    * @public
    */
-  const dlxPath: string;
+  declare const dlxPath: string;
 
   /**
    * Downloads an Asset of a specific release token.
    * @param options - options on how to get the release downloaded
    * @public
    */
-  function downloadGithubRelease(options: DownloadGithubReleaseOptions): Promise<void>;
+  declare function downloadGithubRelease(options: DownloadGithubReleaseOptions): Promise<void>;
 
   /**
    * Options for the downloadGithubRelease function.
    * @public
    */
-  interface DownloadGithubReleaseOptions {
+  declare interface DownloadGithubReleaseOptions {
     /**
      * The Owner of the repo.
      */
@@ -19731,13 +19789,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param options - options on how to get the release downloaded
    * @public
    */
-  function downloadLatestGithubRelease(options: DownloadLatestGithubReleaseOptions): Promise<void>;
+  declare function downloadLatestGithubRelease(options: DownloadLatestGithubReleaseOptions): Promise<void>;
 
   /**
    * Options for the downloadLatestGithubRelease function.
    * @public
    */
-  interface DownloadLatestGithubReleaseOptions {
+  declare interface DownloadLatestGithubReleaseOptions {
     /**
      * The Owner of the repo.
      */
@@ -19763,12 +19821,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     getAsset?: (version: string, assets: ReleaseAssets) => ReleaseAsset | undefined;
   }
 
-  type ECMA = 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
+  declare type ECMA = 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
 
   /**
    * By default, ESLint supports only ECMAScript 5 syntax. You can override that setting to enable support for ECMAScript 6 as well as JSX by using configuration settings.
    */
-  interface EcmaFeatures {
+  declare interface EcmaFeatures {
     arrowFunctions?: boolean;
     binaryLiterals?: boolean;
     blockBindings?: boolean;
@@ -19809,7 +19867,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface EcmaScript6 {
+  declare interface EcmaScript6 {
     /**
      * Require braces around arrow function bodies
      */
@@ -19941,25 +19999,25 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  namespace electron {
+  declare namespace electron {
     export {
       start,
       prepareWixTools
     };
   }
 
-  namespace electron_2 {
+  declare namespace electron_2 {
     export {
       start_2 as start,
       prepareWixTools_2 as prepareWixTools
     };
   }
 
-  type ElementType<T extends Array<any> | undefined> = T extends (infer U)[] ? U : never;
+  declare type ElementType<T extends Array<any> | undefined> = T extends (infer U)[] ? U : never;
 
-  type EmitFile = (emittedFile: EmittedFile) => string;
+  declare type EmitFile = (emittedFile: EmittedFile) => string;
 
-  interface EmittedAsset {
+  declare interface EmittedAsset {
     fileName?: string;
     name?: string;
     needsCodeReference?: boolean;
@@ -19967,7 +20025,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     type: 'asset';
   }
 
-  interface EmittedChunk {
+  declare interface EmittedChunk {
     fileName?: string;
     id: string;
     implicitlyLoadedAfterOneOf?: string[];
@@ -19977,9 +20035,9 @@ declare module "@iiimaddiniii/js-build-tool" {
     type: 'chunk';
   }
 
-  type EmittedFile = EmittedAsset | EmittedChunk | EmittedPrebuiltChunk;
+  declare type EmittedFile = EmittedAsset | EmittedChunk | EmittedPrebuiltChunk;
 
-  interface EmittedPrebuiltChunk {
+  declare interface EmittedPrebuiltChunk {
     code: string;
     exports?: string[];
     fileName: string;
@@ -19988,17 +20046,13 @@ declare module "@iiimaddiniii/js-build-tool" {
     type: 'prebuilt-chunk';
   }
 
-  type EmptyResponseDataType<Responses> = {
+  declare type EmptyResponseDataType<Responses> = {
     [K in EmptyResponseStatuses & keyof Responses]: OctokitResponse<never, K>;
   }[EmptyResponseStatuses & keyof Responses];
 
-  type EmptyResponseStatuses = 201 | 204;
+  declare type EmptyResponseStatuses = 201 | 204;
 
-  interface EncodedSourceMap extends SourceMapV3 {
-    mappings: string;
-  }
-
-  type EncodingOption =
+  declare type EncodingOption =
     | 'utf8'
     // eslint-disable-next-line unicorn/text-encoding-identifier-case
     | 'utf-8'
@@ -20016,7 +20070,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     | null
     | undefined;
 
-  interface Endpoints {
+  declare interface Endpoints {
     /**
      * @see https://docs.github.com/rest/reference/apps#delete-an-installation-for-the-authenticated-app
      */
@@ -23530,7 +23584,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   }
 
   /** Properties of `CompilerOptions` that are normally enums */
-  type EnumCompilerOptions = 'module' | 'moduleResolution' | 'newLine' | 'jsx' | 'target';
+  declare type EnumCompilerOptions = 'module' | 'moduleResolution' | 'newLine' | 'jsx' | 'target';
 
   /**
    * Options for customizing the sort order of {@link ApiEnum} members.
@@ -23544,7 +23598,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  enum EnumMemberOrder {
+  declare enum EnumMemberOrder {
     /**
      * `ApiEnumMember` items are sorted according to their {@link ApiItem.getSortKey}.  The order is
      * basically alphabetical by identifier name, but otherwise unspecified to allow for cosmetic improvements.
@@ -23562,7 +23616,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * An environment defines global variables that are predefined.
    */
-  interface Env {
+  declare interface Env {
     /**
      * defines require() and define() as global variables as per the amd spec
      */
@@ -23669,7 +23723,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specifies environment variables to be made available to the tests. The environment variables defined here override the ones from `process.env`
    */
-  interface EnvironmentVariables {
+  declare interface EnvironmentVariables {
     [k: string]: string | undefined;
   }
 
@@ -23686,15 +23740,15 @@ declare module "@iiimaddiniii/js-build-tool" {
    * ```
    * @public
    */
-  const exec: Execa$<string>;
+  declare const exec: typeof $;
 
-  type Execa$<StdoutStderrType extends StdoutStderrAll = string> = {
+  declare type Execa$<StdoutStderrType extends StdoutStderrAll = string> = {
     /**
       Returns a new instance of `$` but with different default `options`. Consecutive calls are merged to previous ones.
 
       This can be used to either:
-        - Set options for a specific command: `` $(options)`command` ``
-        - Share options for multiple commands: `` const $$ = $(options); $$`command`; $$`otherCommand` ``
+            - Set options for a specific command: `` $(options)`command` ``
+            - Share options for multiple commands: `` const $$ = $(options); $$`command`; $$`otherCommand` ``
 
       @param options - Options to set
       @returns A new instance of `$` with those `options` set
@@ -23771,17 +23825,17 @@ declare module "@iiimaddiniii/js-build-tool" {
     ): ExecaSyncReturnValue<StdoutStderrType>;
   };
 
-  type ExecaChildProcess<StdoutStderrType extends StdoutStderrAll = string> = ChildProcess &
+  declare type ExecaChildProcess<StdoutStderrType extends StdoutStderrAll = string> = ChildProcess &
     ExecaChildPromise<StdoutStderrType> &
     Promise<ExecaReturnValue<StdoutStderrType>>;
 
-  type ExecaChildPromise<StdoutStderrType extends StdoutStderrAll> = {
+  declare type ExecaChildPromise<StdoutStderrType extends StdoutStderrAll> = {
     /**
       Stream combining/interleaving [`stdout`](https://nodejs.org/api/child_process.html#child_process_subprocess_stdout) and [`stderr`](https://nodejs.org/api/child_process.html#child_process_subprocess_stderr).
 
       This is `undefined` if either:
-        - the `all` option is `false` (the default value)
-        - both `stdout` and `stderr` options are set to [`'inherit'`, `'ipc'`, `Stream` or `integer`](https://nodejs.org/dist/latest-v6.x/docs/api/child_process.html#child_process_options_stdio)
+            - the `all` option is `false` (the default value)
+            - both `stdout` and `stderr` options are set to [`'inherit'`, `'ipc'`, `Stream` or `integer`](https://nodejs.org/dist/latest-v6.x/docs/api/child_process.html#child_process_options_stdio)
       */
     all?: Readable;
 
@@ -23829,7 +23883,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     pipeAll?(target: Writable | string): ExecaChildProcess<StdoutStderrType>;
   };
 
-  type ExecaError<StdoutStderrType extends StdoutStderrAll = string> = {
+  declare type ExecaError<StdoutStderrType extends StdoutStderrAll = string> = {
     /**
       The output of the process with `stdout` and `stderr` interleaved.
 
@@ -23845,7 +23899,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     isCanceled: boolean;
   } & ExecaSyncError<StdoutStderrType>;
 
-  type ExecaReturnBase<StdoutStderrType extends StdoutStderrAll> = {
+  declare type ExecaReturnBase<StdoutStderrType extends StdoutStderrAll> = {
     /**
       The file and arguments that were run, for logging purposes.
 
@@ -23921,7 +23975,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    - being canceled
    - there's not enough memory or there are already too many child processes
    */
-  type ExecaReturnValue<StdoutStderrType extends StdoutStderrAll = string> = {
+  declare type ExecaReturnValue<StdoutStderrType extends StdoutStderrAll = string> = {
     /**
       The output of the process with `stdout` and `stderr` interleaved.
 
@@ -23939,7 +23993,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     isCanceled: boolean;
   } & ExecaSyncReturnValue<StdoutStderrType>;
 
-  type ExecaSyncError<StdoutStderrType extends StdoutStderrAll = string> = {
+  declare type ExecaSyncError<StdoutStderrType extends StdoutStderrAll = string> = {
     /**
       Error message when the child process failed to run. In addition to the underlying error message, it also contains some information related to why the child process errored.
 
@@ -23960,7 +24014,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     originalMessage?: string;
   } & Error & ExecaReturnBase<StdoutStderrType>;
 
-  type ExecaSyncReturnValue<StdoutStderrType extends StdoutStderrAll = string> = {
+  declare type ExecaSyncReturnValue<StdoutStderrType extends StdoutStderrAll = string> = {
   } & ExecaReturnBase<StdoutStderrType>;
 
   /**
@@ -23969,9 +24023,9 @@ declare module "@iiimaddiniii/js-build-tool" {
    * "browser" = Code is Executed by a Browser.
    * @public
    */
-  export type ExecutionEnvironment = "node" | "browser";
+  export declare type ExecutionEnvironment = "node" | "browser";
 
-  interface ExistingDecodedSourceMap {
+  declare interface ExistingDecodedSourceMap {
     file?: string;
     readonly mappings: SourceMapSegment[][];
     names: string[];
@@ -23982,7 +24036,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     x_google_ignoreList?: number[];
   }
 
-  interface ExistingRawSourceMap {
+  declare interface ExistingRawSourceMap {
     file?: string;
     mappings: string;
     names: string[];
@@ -23999,7 +24053,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function exit(): TaskFunction;
+  declare function exit(): TaskFunction;
 
   /**
    * Exists the gulp task after all tasks finished in series.
@@ -24007,13 +24061,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns
    * @public
    */
-  function exitAfter(...tasks: TaskFunction[]): TaskFunction;
+  declare function exitAfter(...tasks: TaskFunction[]): TaskFunction;
 
   /**
    * Options on how to generate an entrypoint.
    * @public
    */
-  export interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs" | "inputFile" | "prod">>, Partial<OutputOpts> {
+  export declare interface ExportOpts extends Partial<Omit<DefaultExportOpts, "outputs" | "inputFile" | "prod">>, Partial<OutputOpts> {
     /**
      * An callback function wich is called for each Entrypoint.
      * Used to modify the Entrypoint Options and name before the config is normalized.
@@ -24037,7 +24091,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * A string[] or Map with Options with entrypoints.
    * @public
    */
-  export type ExportsOpts = string[] | {
+  export declare type ExportsOpts = string[] | {
     [key: string]: ExportOpts;
   };
 
@@ -24047,19 +24101,19 @@ declare module "@iiimaddiniii/js-build-tool" {
    * "lib" = A library wich will be eventually be used by an Application (dependencies are not bundled).
    * @public
    */
-  export type ExportType = "app" | "lib";
+  export declare type ExportType = "app" | "lib";
 
-  interface Extensions {
+  declare interface Extensions {
     [k: string]: ("commonjs" | "module") | undefined;
   }
 
-  type ExternalOption =
+  declare type ExternalOption =
     | (string | RegExp)[]
     | string
     | RegExp
     | ((source: string, importer: string | undefined, isResolved: boolean) => boolean | NullValue);
 
-  type ExtractOctokitResponse<R> = "responses" extends keyof R ? SuccessResponseDataType<R["responses"]> extends never ? RedirectResponseDataType<R["responses"]> extends never ? EmptyResponseDataType<R["responses"]> : RedirectResponseDataType<R["responses"]> : SuccessResponseDataType<R["responses"]> : unknown;
+  declare type ExtractOctokitResponse<R> = "responses" extends keyof R ? SuccessResponseDataType<R["responses"]> extends never ? RedirectResponseDataType<R["responses"]> extends never ? EmptyResponseDataType<R["responses"]> : RedirectResponseDataType<R["responses"]> : SuccessResponseDataType<R["responses"]> : unknown;
 
   /**
    * Used with {@link IConfigMessageReportingRule.logLevel} and {@link IExtractorInvokeOptions.messageCallback}.
@@ -24069,7 +24123,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  const enum ExtractorLogLevel {
+  declare enum ExtractorLogLevel {
     /**
      * The message will be displayed as an error.
      *
@@ -24104,11 +24158,11 @@ declare module "@iiimaddiniii/js-build-tool" {
     None = "none"
   }
 
-  type ExtractParameters<T> = "parameters" extends keyof T ? UnionToIntersection<{
+  declare type ExtractParameters<T> = "parameters" extends keyof T ? UnionToIntersection<{
     [K in keyof T["parameters"]]: T["parameters"][K];
   }[keyof T["parameters"]]> : {};
 
-  type ExtractRequestBody<T> = "requestBody" extends keyof T ? "content" extends keyof T["requestBody"] ? "application/json" extends keyof T["requestBody"]["content"] ? T["requestBody"]["content"]["application/json"] : {
+  declare type ExtractRequestBody<T> = "requestBody" extends keyof T ? "content" extends keyof T["requestBody"] ? "application/json" extends keyof T["requestBody"]["content"] ? T["requestBody"]["content"]["application/json"] : {
     data: {
       [K in keyof T["requestBody"]["content"]]: T["requestBody"]["content"][K];
     }[keyof T["requestBody"]["content"]];
@@ -24121,9 +24175,9 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Browser's fetch method (or compatible such as fetch-mock)
    */
-  type Fetch = any;
+  declare type Fetch = any;
 
-  interface FetchReleaseOptions extends RepoInfo {
+  declare interface FetchReleaseOptions extends RepoInfo {
     getRelease: (owner: string, repo: string) => Promise<OctokitRelease>;
     getAsset?: (version: string, assets: OctokitReleaseAssets) => OctokitReleaseAssets[number] | undefined;
     accessToken?: string;
@@ -24137,12 +24191,12 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns the absolute path of the file.
    * @public
    */
-  function file(relPath: string): string;
+  declare function file(relPath: string): string;
 
   /**
    * A valid `picomatch` glob pattern, or array of patterns.
    */
-  type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
+  declare type FilterPattern = ReadonlyArray<string | RegExp> | string | RegExp | null;
 
   /**
    * Finds the temporary project folder of the pnpm dlx operation.
@@ -24150,7 +24204,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns the upper most folder with node_modules inside.
    * @public
    */
-  function findDlxPath(packagePath: string): string;
+  declare function findDlxPath(packagePath: string): string;
 
   /**
    * Finds the path where js-build-tool was installed by pnpm.
@@ -24158,9 +24212,9 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns path to the folder named "js-build-tool".
    * @public
    */
-  function findJsBuildToolPath(start: string): string;
+  declare function findJsBuildToolPath(start: string): string;
 
-  type FirstPluginHooks =
+  declare type FirstPluginHooks =
     | 'load'
     | 'renderDynamicImport'
     | 'resolveDynamicImport'
@@ -24169,11 +24223,11 @@ declare module "@iiimaddiniii/js-build-tool" {
     | 'resolveImportMeta'
     | 'shouldTransformCachedModule';
 
-  interface FlexibleCompilerOptions extends CompilerOptions {
+  declare interface FlexibleCompilerOptions extends CompilerOptions {
     [option: string]: CompilerOptionsValue | TsConfigSourceFile | undefined | any;
   }
 
-  interface Font {
+  declare interface Font {
     /**
      * Specify whether or not quotation marks should be used around font family names
      */
@@ -24347,7 +24401,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface FormatOptions {
+  declare interface FormatOptions {
     ascii_only?: boolean;
     /** @deprecated Not implemented anymore */
     beautify?: boolean;
@@ -24382,13 +24436,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     wrap_func_args?: boolean;
   }
 
-  /**
-   * The NodeJs fs/promises module.
-   * @public
-   */
-  let fs: typeof promises;
-
-  interface Function_2 {
+  declare interface Function_2 {
     "function-blacklist"?: ArrayStringRule3;
     "function-calc-no-unspaced-operator"?: BooleanRule10;
     "function-comma-newline-after"?: NewlineRule4;
@@ -24456,7 +24504,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface FunctionPluginHooks {
+  declare interface FunctionPluginHooks {
     augmentChunkHash: (this: PluginContext, chunk: RenderedChunk) => string | void;
     buildEnd: (this: PluginContext, error?: Error) => void;
     buildStart: (this: PluginContext, options: NormalizedInputOptions) => void;
@@ -24506,12 +24554,12 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * URL to a website with details about how to fund the package.
    */
-  type FundingUrl = string;
+  declare type FundingUrl = string;
 
   /**
    * Used to inform about ways to help fund development of the package.
    */
-  interface FundingWay {
+  declare interface FundingWay {
     url: FundingUrl;
     /**
      * The type of funding or the platform through which funding can be provided, e.g. patreon, opencollective, tidelift or github.
@@ -24519,7 +24567,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     type?: string;
   }
 
-  interface GeneralSheet {
+  declare interface GeneralSheet {
     /**
      * Specify indentation
      */
@@ -24868,57 +24916,73 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface GeneratedCodeOptions extends Partial<NormalizedGeneratedCodeOptions> {
+  declare interface GeneratedCodeOptions extends Partial<NormalizedGeneratedCodeOptions> {
     preset?: GeneratedCodePreset;
   }
 
-  type GeneratedCodePreset = 'es5' | 'es2015';
+  declare type GeneratedCodePreset = 'es5' | 'es2015';
 
-  type GeneratedColumn = number;
-
-  type GetContentKeyIfPresent<T> = "content" extends keyof T ? DataType<T["content"]> : DataType<T>;
-
-  type GetInterop = (id: string | null) => InteropType;
-
-  type GetManualChunk = (id: string, meta: ManualChunkMeta) => string | NullValue;
-
-  type GetModuleInfo = (moduleId: string) => ModuleInfo | null;
+  declare type GetContentKeyIfPresent<T> = "content" extends keyof T ? DataType<T["content"]> : DataType<T>;
 
   /**
-   * Reads the Dependencies field of the project package.json file.
+   * Reads the Dependencies field of the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
    * @returns a Map of all dependencies.
    * @public
    */
-  function getProjectDependencies(): Promise<Dependency>;
+  declare function getDependencies(path?: string, cache?: boolean): Promise<Dependency>;
 
   /**
-   * Reads the DevDependencies field of the project package.json file.
+   * Reads the DevDependencies field of the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
    * @returns a Map of all devDependencies.
    * @public
    */
-  function getProjectDevDependencies(): Promise<Dependency>;
+  declare function getDevDependencies(path?: string, cache?: boolean): Promise<Dependency>;
+
+  declare type GetInterop = (id: string | null) => InteropType;
+
+  declare type GetManualChunk = (id: string, meta: ManualChunkMeta) => string | NullValue;
+
+  declare type GetModuleInfo = (moduleId: string) => ModuleInfo | null;
 
   /**
-   * Reads the contents of a package.json of the project and caches it.
-   * @param cache - wether it should read the cached version (default = true).
-   * @returns the Object representing the content of the  project package.json file.
-   * @public
-   */
-  function getProjectPackageJson(cache?: boolean): Promise<JSONSchemaForNPMPackageJsonFiles>;
-
-  /**
-   * Reads the type field of the project package.json file.
+   * Reads the node version to use under enginesToUse.node of the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
    * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
    * @public
    */
-  function getProjectPackageType(): Promise<JSONSchemaForNPMPackageJsonFiles["type"]>;
+  declare function getNodeVersionToUse(path?: string, cache?: boolean): Promise<string | undefined>;
 
   /**
-   * Reads the exports field of the project package.json file and returns the top level export paths.
-   * @returns an string[] containing all top level exports.
+   * Reads the name field of the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
+   * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
    * @public
    */
-  function getProjectTopLevelExports(): Promise<string[]>;
+  declare function getPackageName(path?: string, cache?: boolean): Promise<string | undefined>;
+
+  /**
+   * Reads the type field of the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
+   * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
+   * @public
+   */
+  declare function getPackageType(path?: string, cache?: boolean): Promise<JSONSchemaForNPMPackageJsonFiles["type"]>;
+
+  /**
+   * Reads the version field of the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
+   * @returns the type of the project package.json file ("commonjs" | "module" | undefined).
+   * @public
+   */
+  declare function getPackageVersion(path?: string, cache?: boolean): Promise<string | undefined>;
 
   /**
    * Calculates the paths to the generated test files.
@@ -24926,32 +24990,43 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns An Array of files wich includes the tests.
    * @public
    */
-  function getTestFiles(defaultConfigOpts: DefaultConfigOpts): string[];
+  declare function getTestFiles(defaultConfigOpts: DefaultConfigOpts): string[];
+
+  /**
+   * Reads the exports field of the package.json file and returns the top level export paths.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
+   * @returns an string[] containing all top level exports.
+   * @public
+   */
+  declare function getTopLevelExports(path?: string, cache?: boolean): Promise<string[]>;
 
   /**
    * Set each global variable name equal to true to allow the variable to be overwritten or false to disallow overwriting.
    */
-  interface Globals {
+  declare interface Globals {
     [k: string]: (("readonly" | "writable" | "off") | boolean) | undefined;
   }
 
-  type GlobalsOption = { [name: string]: string; } | ((name: string) => string);
+  declare type GlobalsOption = { [name: string]: string; } | ((name: string) => string);
 
   /**
    * The name of the gulpfile.
    * @public
    */
-  const gulpFileName = "gulpfile.mjs";
+  declare const gulpFileName = "gulpfile.mjs";
 
   /**
    * The path to the gulpfile.
    * @public
    */
-  const gulpFilePath: string;
+  declare const gulpFilePath: string;
 
-  type HasModuleSideEffects = (id: string, external: boolean) => boolean;
+  declare type HashCharacters = 'base64' | 'base36' | 'hex';
 
-  interface HttpsJsonSchemastoreOrgJscpdJson {
+  declare type HasModuleSideEffects = (id: string, external: boolean) => boolean;
+
+  declare interface HttpsJsonSchemastoreOrgJscpdJson {
     /**
      * minimum size of code block in lines to check for duplication
      */
@@ -25268,7 +25343,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigApiReport {
+  declare interface IConfigApiReport {
     /**
      * Whether to generate an API report.
      */
@@ -25325,7 +25400,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigCompiler {
+  declare interface IConfigCompiler {
     /**
      * Specifies the path to the tsconfig.json file to be used by API Extractor when analyzing the project.
      *
@@ -25367,7 +25442,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigDocModel {
+  declare interface IConfigDocModel {
     /**
      * Whether to generate a doc model file.
      */
@@ -25413,7 +25488,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigDtsRollup {
+  declare interface IConfigDtsRollup {
     /**
      * Whether to generate the .d.ts rollup file.
      */
@@ -25476,7 +25551,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigFile {
+  declare interface IConfigFile {
     /**
      * Optionally specifies another JSON config file that this file extends from.  This provides a way for
      * standard settings to be shared across multiple projects.
@@ -25596,7 +25671,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigMessageReportingRule {
+  declare interface IConfigMessageReportingRule {
     /**
      * Specifies whether the message should be written to the the tool's output log.
      *
@@ -25621,7 +25696,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigMessageReportingTable {
+  declare interface IConfigMessageReportingTable {
     /**
      * The key is a message identifier for the associated type of message, or "default" to specify the default policy.
      * For example, the key might be `TS2551` (a compiler message), `tsdoc-link-tag-unescaped-text` (a TSDOc message),
@@ -25638,7 +25713,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IConfigTsdocMetadata {
+  declare interface IConfigTsdocMetadata {
     /**
      * Whether to generate the tsdoc-metadata.json file.
      */
@@ -25665,7 +25740,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @public
    */
-  interface IExtractorMessagesConfig {
+  declare interface IExtractorMessagesConfig {
     /**
      * Configures handling of diagnostic messages generating the TypeScript compiler while analyzing the
      * input .d.ts files.
@@ -25681,16 +25756,16 @@ declare module "@iiimaddiniii/js-build-tool" {
     tsdocMessageReporting?: IConfigMessageReportingTable;
   }
 
-  enum InlineFunctions {
+  declare enum InlineFunctions {
     Disabled = 0,
     SimpleFunctions = 1,
     WithArguments = 2,
     WithArgumentsAndVariables = 3
   }
 
-  type InputOption = string | string[] | { [entryAlias: string]: string; };
+  declare type InputOption = string | string[] | { [entryAlias: string]: string; };
 
-  interface InputOptions {
+  declare interface InputOptions {
     cache?: boolean | RollupCache;
     context?: string;
     experimentalCacheExpiry?: number;
@@ -25713,7 +25788,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     watch?: WatcherOptions | false;
   }
 
-  type InputPluginOption = MaybePromise<Plugin | NullValue | false | InputPluginOption[]>;
+  declare type InputPluginOption = MaybePromise<Plugin | NullValue | false | InputPluginOption[]>;
 
   /**
    * Installs all dependencies of the package using pnpm.
@@ -25722,19 +25797,19 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function installDependencies(): TaskFunction;
+  declare function installDependencies(): TaskFunction;
 
   /**
    * Installs all dependencies of the package using pnpm.
    * Will use the frozen lockfile in Production mode.
    * @public
    */
-  function installDependencies_2(): Promise<void>;
+  declare function installDependencies_2(): Promise<void>;
 
   /**
    * Limit the number of declaration within a single line declaration block
    */
-  type IntegerRule = (
+  declare type IntegerRule = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25771,7 +25846,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the number of adjacent empty lines within functions
    */
-  type IntegerRule1 = (
+  declare type IntegerRule1 = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25808,7 +25883,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the number of adjacent empty lines
    */
-  type IntegerRule2 = (
+  declare type IntegerRule2 = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25845,7 +25920,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the number of decimal places allowed in numbers
    */
-  type IntegerRule3 = (
+  declare type IntegerRule3 = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25882,7 +25957,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the number of compound selectors in a selector
    */
-  type IntegerRule4 = (
+  declare type IntegerRule4 = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25919,7 +25994,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the number of adjacent empty lines within selectors
    */
-  type IntegerRule5 = (
+  declare type IntegerRule5 = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25956,7 +26031,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the number of adjacent empty lines within value lists
    */
-  type IntegerRule6 = (
+  declare type IntegerRule6 = (
     | (null | number)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & number) | ({} | CoreRule)),
@@ -25990,11 +26065,11 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  type InternalModuleFormat = 'amd' | 'cjs' | 'es' | 'iife' | 'system' | 'umd';
+  declare type InternalModuleFormat = 'amd' | 'cjs' | 'es' | 'iife' | 'system' | 'umd';
 
-  type InteropType = 'compat' | 'auto' | 'esModule' | 'default' | 'defaultOnly';
+  declare type InteropType = 'compat' | 'auto' | 'esModule' | 'default' | 'defaultOnly';
 
-  type IsExternal = (
+  declare type IsExternal = (
     source: string,
     importer: string | undefined,
     isResolved: boolean
@@ -26005,19 +26080,19 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns true when it is in production mode.
    * @public
    */
-  function isProd(): boolean;
+  declare function isProd(): boolean;
 
   /**
    * Path where the js-build-tool was installed.
    * @public
    */
-  const jsBuildToolPath: string;
+  declare const jsBuildToolPath: string;
 
   /** JSON representation of Typescript compiler options */
-  type JsonCompilerOptions = Omit<FlexibleCompilerOptions, EnumCompilerOptions> &
+  declare type JsonCompilerOptions = Omit<FlexibleCompilerOptions, EnumCompilerOptions> &
     Record<EnumCompilerOptions, string>;
 
-  interface JSONSchemaForESLintConfigurationFiles {
+  declare interface JSONSchemaForESLintConfigurationFiles {
     ecmaFeatures?: EcmaFeatures;
     env?: Env;
     /**
@@ -26052,13 +26127,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * and run json-schema-to-typescript to regenerate this file.
    */
 
-  type JSONSchemaForNPMPackageJsonFiles = JSONSchemaForNPMPackageJsonFiles1 & JSONSchemaForNPMPackageJsonFiles2;
+  declare type JSONSchemaForNPMPackageJsonFiles = JSONSchemaForNPMPackageJsonFiles1 & JSONSchemaForNPMPackageJsonFiles2;
 
-  type JSONSchemaForNPMPackageJsonFiles1 = {
+  declare type JSONSchemaForNPMPackageJsonFiles1 = {
     [k: string]: unknown | undefined;
   };
 
-  interface JSONSchemaForNPMPackageJsonFiles2 {
+  declare interface JSONSchemaForNPMPackageJsonFiles2 {
     /**
      * The name of the package.
      */
@@ -26413,7 +26488,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: any;
   }
 
-  interface JSONSchemaForTheStylelintConfigurationFiles {
+  declare interface JSONSchemaForTheStylelintConfigurationFiles {
     extends?: SimpleStringOrArrayStringRule;
     plugins?: SimpleArrayStringRule1;
     /**
@@ -26458,12 +26533,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface KeyframeDeclaration {
+  declare interface KeyframeDeclaration {
     "keyframe-declaration-no-important"?: BooleanRule20;
     [k: string]: unknown | undefined;
   }
 
-  type KillOptions = {
+  declare type KillOptions = {
     /**
       Milliseconds to wait for the child process to terminate before sending `SIGKILL`.
 
@@ -26474,9 +26549,9 @@ declare module "@iiimaddiniii/js-build-tool" {
     forceKillAfterTimeout?: number | false;
   };
 
-  type KnownJsonResponseTypes = "application/json" | "application/scim+json" | "text/html";
+  declare type KnownJsonResponseTypes = "application/json" | "application/scim+json" | "text/html";
 
-  interface Legacy {
+  declare interface Legacy {
     "max-depth"?: number | ("off" | "warn" | "error") | unknown[];
     "max-len"?: number | ("off" | "warn" | "error") | unknown[];
     "max-params"?: number | ("off" | "warn" | "error") | unknown[];
@@ -26486,40 +26561,40 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface Length {
+  declare interface Length {
     "length-zero-no-unit"?: BooleanRule21;
     [k: string]: unknown | undefined;
   }
 
-  type LoadHook = (this: PluginContext, id: string) => LoadResult;
+  declare type LoadHook = (this: PluginContext, id: string) => LoadResult;
 
-  type LoadResult = SourceDescription | string | NullValue;
+  declare type LoadResult = SourceDescription | string | NullValue;
 
-  type LoggingFunction = (log: RollupLog | string | (() => RollupLog | string)) => void;
+  declare type LoggingFunction = (log: RollupLog | string | (() => RollupLog | string)) => void;
 
-  type LoggingFunctionWithPosition = (
+  declare type LoggingFunctionWithPosition = (
     log: RollupLog | string | (() => RollupLog | string),
     pos?: number | { column: number; line: number; }
   ) => void;
 
-  type LogHandler = (level: LogLevel, log: RollupLog) => void;
+  declare type LogHandler = (level: LogLevel, log: RollupLog) => void;
 
-  type LogHandlerWithDefault = (
+  declare type LogHandlerWithDefault = (
     level: LogLevel,
     log: RollupLog,
     defaultHandler: LogOrStringHandler
   ) => void;
 
-  type LogLevel = 'warn' | 'info' | 'debug';
+  declare type LogLevel = 'warn' | 'info' | 'debug';
 
-  type LogLevelOption = LogLevel | 'silent';
+  declare type LogLevelOption = LogLevel | 'silent';
 
-  type LogOrStringHandler = (level: LogLevel | 'error', log: RollupLog | string) => void;
+  declare type LogOrStringHandler = (level: LogLevel | 'error', log: RollupLog | string) => void;
 
   /**
    * Specify lowercase or uppercase for at-rules names
    */
-  type LowerUpperRule = (
+  declare type LowerUpperRule = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26568,7 +26643,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for hex colors
    */
-  type LowerUpperRule1 = (
+  declare type LowerUpperRule1 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26617,7 +26692,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for media feature names
    */
-  type LowerUpperRule2 = (
+  declare type LowerUpperRule2 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26666,7 +26741,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for properties
    */
-  type LowerUpperRule3 = (
+  declare type LowerUpperRule3 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26715,7 +26790,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for pseudo-class selectors
    */
-  type LowerUpperRule4 = (
+  declare type LowerUpperRule4 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26764,7 +26839,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for pseudo-element selectors
    */
-  type LowerUpperRule5 = (
+  declare type LowerUpperRule5 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26813,7 +26888,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for type selectors
    */
-  type LowerUpperRule6 = (
+  declare type LowerUpperRule6 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26862,7 +26937,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify lowercase or uppercase for units
    */
-  type LowerUpperRule7 = (
+  declare type LowerUpperRule7 = (
     | null
     | ("lower" | "upper" | [])
     | [
@@ -26908,7 +26983,7 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  type MakeAsync<Function_> = Function_ extends (
+  declare type MakeAsync<Function_> = Function_ extends (
     this: infer This,
     ...parameters: infer Arguments
   ) => infer Return
@@ -26922,13 +26997,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns Rollup Plugin Instance.
    * @public
    */
-  function manageDependencies(config: ManageDependenciesConfig): Plugin;
+  declare function manageDependencies(config: ManageDependenciesConfig): Plugin;
 
   /**
    * Configuration Options for the ManageDependencies Rollup Plugin.
    * @public
    */
-  interface ManageDependenciesConfig {
+  declare interface ManageDependenciesConfig {
     /**
      * Array of Packages/Paths wich should not be bundled.
      */
@@ -26939,7 +27014,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     blacklist?: string[];
   }
 
-  interface MangleOptions {
+  declare interface MangleOptions {
     eval?: boolean;
     keep_classnames?: boolean | RegExp;
     keep_fnames?: boolean | RegExp;
@@ -26951,7 +27026,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     toplevel?: boolean;
   }
 
-  interface ManglePropertiesOptions {
+  declare interface ManglePropertiesOptions {
     builtins?: boolean;
     debug?: boolean;
     keep_quoted?: boolean | 'strict';
@@ -26960,16 +27035,16 @@ declare module "@iiimaddiniii/js-build-tool" {
     reserved?: string[];
   }
 
-  interface ManualChunkMeta {
+  declare interface ManualChunkMeta {
     getModuleIds: () => IterableIterator<string>;
     getModuleInfo: GetModuleInfo;
   }
 
-  type ManualChunksOption = { [chunkAlias: string]: string[]; } | GetManualChunk;
+  declare type ManualChunksOption = { [chunkAlias: string]: string[]; } | GetManualChunk;
 
-  type MaybePromise<T> = T | Promise<T>;
+  declare type MaybePromise<T> = T | Promise<T>;
 
-  interface MediaFeature {
+  declare interface MediaFeature {
     "media-feature-colon-space-after"?: AlwaysNeverRule9;
     "media-feature-colon-space-before"?: AlwaysNeverRule10;
     "media-feature-name-case"?: LowerUpperRule2;
@@ -27021,7 +27096,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface MediaQueryList {
+  declare interface MediaQueryList {
     "media-query-list-comma-newline-after"?: NewlineRule7;
     "media-query-list-comma-newline-before"?: NewlineRule8;
     "media-query-list-comma-space-after"?: SpaceRule5;
@@ -27029,7 +27104,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type MethodsMap = {
+  declare type MethodsMap = {
     delete: "DELETE";
     get: "GET";
     patch: "PATCH";
@@ -27037,7 +27112,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     put: "PUT";
   };
 
-  interface MinifyOptions {
+  declare interface MinifyOptions {
     compress?: boolean | CompressOptions;
     ecma?: ECMA;
     enclose?: boolean | string;
@@ -27056,7 +27131,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     toplevel?: boolean;
   }
 
-  interface MinimalPluginContext {
+  declare interface MinimalPluginContext {
     debug: LoggingFunction;
     error: (error: RollupError | string) => never;
     info: LoggingFunction;
@@ -27064,10 +27139,10 @@ declare module "@iiimaddiniii/js-build-tool" {
     warn: LoggingFunction;
   }
 
-  type ModuleFormat = InternalModuleFormat | 'commonjs' | 'esm' | 'module' | 'systemjs';
+  declare type ModuleFormat = InternalModuleFormat | 'commonjs' | 'esm' | 'module' | 'systemjs';
 
-  interface ModuleInfo extends ModuleOptions {
-    ast: AstNode | null;
+  declare interface ModuleInfo extends ModuleOptions {
+    ast: ProgramNode | null;
     code: string | null;
     dynamicImporters: readonly string[];
     dynamicallyImportedIdResolutions: readonly ResolvedId[];
@@ -27086,31 +27161,29 @@ declare module "@iiimaddiniii/js-build-tool" {
     isIncluded: boolean | null;
   }
 
-  interface ModuleJSON extends TransformModuleJSON, ModuleOptions {
-    ast: AstNode;
+  declare interface ModuleJSON extends TransformModuleJSON, ModuleOptions {
+    ast: ProgramNode;
     dependencies: string[];
     id: string;
     resolvedIds: ResolvedIdMap;
     transformFiles: EmittedFile[] | undefined;
   }
 
-  interface ModuleOptions {
+  declare interface ModuleOptions {
     attributes: Record<string, string>;
     meta: CustomPluginOptions;
     moduleSideEffects: boolean | 'no-treeshake';
     syntheticNamedExports: boolean | string;
   }
 
-  type ModuleParsedHook = (this: PluginContext, info: ModuleInfo) => void;
+  declare type ModuleParsedHook = (this: PluginContext, info: ModuleInfo) => void;
 
-  type ModuleSideEffectsOption = boolean | 'no-external' | string[] | HasModuleSideEffects;
-
-  type NamesIndex = number;
+  declare type ModuleSideEffectsOption = boolean | 'no-external' | string[] | HasModuleSideEffects;
 
   /**
    * Require a newline or disallow whitespace before the closing brace of blocks
    */
-  type NewlineRule = (
+  declare type NewlineRule = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27183,7 +27256,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline after the opening brace of blocks
    */
-  type NewlineRule1 = (
+  declare type NewlineRule1 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27256,7 +27329,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace before the commas of selector lists
    */
-  type NewlineRule10 = (
+  declare type NewlineRule10 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27329,7 +27402,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the commas of value lists
    */
-  type NewlineRule11 = (
+  declare type NewlineRule11 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27402,7 +27475,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace before the commas of value lists
    */
-  type NewlineRule12 = (
+  declare type NewlineRule12 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27475,7 +27548,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the semicolons of declaration blocks
    */
-  type NewlineRule2 = (
+  declare type NewlineRule2 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27548,7 +27621,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace before the semicolons of declaration blocks
    */
-  type NewlineRule3 = (
+  declare type NewlineRule3 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27621,7 +27694,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the commas of functions
    */
-  type NewlineRule4 = (
+  declare type NewlineRule4 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27694,7 +27767,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace before the commas of functions
    */
-  type NewlineRule5 = (
+  declare type NewlineRule5 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27767,7 +27840,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace on the inside of the parentheses of functions
    */
-  type NewlineRule6 = (
+  declare type NewlineRule6 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27840,7 +27913,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the commas of media query lists
    */
-  type NewlineRule7 = (
+  declare type NewlineRule7 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27913,7 +27986,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace before the commas of media query lists
    */
-  type NewlineRule8 = (
+  declare type NewlineRule8 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -27986,7 +28059,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the commas of selector lists
    */
-  type NewlineRule9 = (
+  declare type NewlineRule9 = (
     | null
     | ("always" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -28059,7 +28132,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the closing brace of blocks
    */
-  type NewlineSpaceRule = (
+  declare type NewlineSpaceRule = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -28428,7 +28501,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the closing brace of blocks
    */
-  type NewlineSpaceRule1 = (
+  declare type NewlineSpaceRule1 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -28797,7 +28870,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the opening brace of blocks
    */
-  type NewlineSpaceRule2 = (
+  declare type NewlineSpaceRule2 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -29166,7 +29239,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a newline or disallow whitespace after the closing brace of blocks
    */
-  type NewlineSpaceWithIgnoreRule = (
+  declare type NewlineSpaceWithIgnoreRule = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -29441,7 +29514,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the opening brace of blocks
    */
-  type NewlineSpaceWithIgnoreRule1 = (
+  declare type NewlineSpaceWithIgnoreRule1 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | "always-multi-line" | "never-multi-line" | [])
     | [
@@ -29713,7 +29786,7 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  interface NodeAndCommonJs {
+  declare interface NodeAndCommonJs {
     /**
      * Require return statements after callbacks
      */
@@ -29765,9 +29838,9 @@ declare module "@iiimaddiniii/js-build-tool" {
    * The node_modules folder inside the temporary project folder of the pnpm dlx operation.
    * @public
    */
-  const nodeModulesPath: string;
+  declare const nodeModulesPath: string;
 
-  type NormalizedAmdOptions = (
+  declare type NormalizedAmdOptions = (
     | {
       autoId: false;
       id?: string;
@@ -29781,7 +29854,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     forceJsExtensionForImports: boolean;
   };
 
-  interface NormalizedGeneratedCodeOptions {
+  declare interface NormalizedGeneratedCodeOptions {
     arrowFunctions: boolean;
     constBindings: boolean;
     objectShorthand: boolean;
@@ -29789,7 +29862,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     symbols: boolean;
   }
 
-  interface NormalizedInputOptions {
+  declare interface NormalizedInputOptions {
     cache: false | undefined | RollupCache;
     context: string;
     experimentalCacheExpiry: number;
@@ -29810,7 +29883,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     treeshake: false | NormalizedTreeshakingOptions;
   }
 
-  interface NormalizedOutputOptions {
+  declare interface NormalizedOutputOptions {
     amd: NormalizedAmdOptions;
     assetFileNames: string | ((chunkInfo: PreRenderedAsset) => string);
     banner: AddonFunction;
@@ -29833,6 +29906,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     freeze: boolean;
     generatedCode: NormalizedGeneratedCodeOptions;
     globals: GlobalsOption;
+    hashCharacters: HashCharacters;
     hoistTransitiveImports: boolean;
     indent: true | string;
     inlineDynamicImports: boolean;
@@ -29847,6 +29921,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     plugins: OutputPlugin[];
     preserveModules: boolean;
     preserveModulesRoot: string | undefined;
+    reexportProtoFromExternal: boolean;
     sanitizeFileName: (fileName: string) => string;
     sourcemap: boolean | 'inline' | 'hidden';
     sourcemapBaseUrl: string | undefined;
@@ -29860,7 +29935,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     validate: boolean;
   }
 
-  interface NormalizedTreeshakingOptions {
+  declare interface NormalizedTreeshakingOptions {
     annotations: boolean;
     correctVarValueBeforeDeclaration: boolean;
     manualPureFunctions: readonly string[];
@@ -29870,21 +29945,21 @@ declare module "@iiimaddiniii/js-build-tool" {
     unknownGlobalSideEffects: boolean;
   }
 
-  type NullValue = null | undefined | void;
+  declare type NullValue = null | undefined | void;
 
-  interface Number_2 {
+  declare interface Number_2 {
     "number-leading-zero"?: AlwaysNeverRule14;
     "number-max-precision"?: IntegerRule3;
     "number-no-trailing-zeros"?: BooleanRule24;
     [k: string]: unknown | undefined;
   }
 
-  type ObjectHook<T, O = {}> = T | ({ handler: T; order?: 'pre' | 'post' | null; } & O);
+  declare type ObjectHook<T, O = {}> = T | ({ handler: T; order?: 'pre' | 'post' | null; } & O);
 
   /**
    * Specify a blacklist of disallowed property and unit pairs within declarations
    */
-  type ObjectRule = (
+  declare type ObjectRule = (
     | null
     | {
       [k: string]: SimpleArrayStringRule;
@@ -29920,7 +29995,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed property and unit pairs within declarations
    */
-  type ObjectRule1 = (
+  declare type ObjectRule1 = (
     | null
     | {
       [k: string]: SimpleArrayStringRule;
@@ -29956,7 +30031,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a blacklist of disallowed property and value pairs within declarations
    */
-  type ObjectRule2 = (
+  declare type ObjectRule2 = (
     | null
     | {
       [k: string]: SimpleArrayStringRule;
@@ -29992,7 +30067,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed property and value pairs within declarations
    */
-  type ObjectRule3 = (
+  declare type ObjectRule3 = (
     | null
     | {
       [k: string]: SimpleArrayStringRule;
@@ -30025,11 +30100,11 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  type OctokitRelease = RestEndpointMethodTypes['repos']['getLatestRelease']['response'];
+  declare type OctokitRelease = RestEndpointMethodTypes['repos']['getLatestRelease']['response'];
 
-  type OctokitReleaseAssets = OctokitRelease['data']['assets'];
+  declare type OctokitReleaseAssets = OctokitRelease['data']['assets'];
 
-  type OctokitResponse<T, S extends number = number> = {
+  declare type OctokitResponse<T, S extends number = number> = {
     headers: ResponseHeaders;
     /**
      * http response code
@@ -30045,7 +30120,15 @@ declare module "@iiimaddiniii/js-build-tool" {
     data: T;
   };
 
-  type Operation<Url extends keyof paths, Method extends keyof paths[Url], preview = unknown> = {
+  declare type OmittedEstreeKeys =
+    | 'loc'
+    | 'range'
+    | 'leadingComments'
+    | 'trailingComments'
+    | 'innerComments'
+    | 'comments';
+
+  declare type Operation<Url extends keyof paths, Method extends keyof paths[Url], preview = unknown> = {
     parameters: ToOctokitParameters<paths[Url][Method]> & RequiredPreview<preview>;
     request: {
       method: Method extends keyof MethodsMap ? MethodsMap[Method] : never;
@@ -30056,7 +30139,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     response: ExtractOctokitResponse<paths[Url][Method]>;
   };
 
-  interface operations {
+  declare interface operations {
     /** Get Hypermedia links to resources accessible in GitHub's REST API */
     "meta/root": {
       responses: {
@@ -57301,12 +57384,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     };
   }
 
-  interface Options extends MinifyOptions {
+  declare interface Options extends MinifyOptions {
     nameCache?: Record<string, any>;
     maxWorkers?: number;
   }
 
-  type Options_2<EncodingType extends EncodingOption = DefaultEncodingOption> = {
+  declare type Options_2<EncodingType extends EncodingOption = DefaultEncodingOption> = {
     /**
       Write some input to the `stdin` of your binary.
 
@@ -57322,7 +57405,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     readonly inputFile?: string;
   } & CommonOptions<EncodingType>;
 
-  interface OptionsDefinition {
+  declare interface OptionsDefinition {
     /**
      * Include parentheses around a sole arrow function parameter.
      */
@@ -57469,7 +57552,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * The options to apply for this override.
    */
-  interface OptionsDefinition1 {
+  declare interface OptionsDefinition1 {
     /**
      * Include parentheses around a sole arrow function parameter.
      */
@@ -57613,18 +57696,18 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type OptionsPaths = Record<string, string> | ((id: string) => string);
+  declare type OptionsPaths = Record<string, string> | ((id: string) => string);
 
-  interface OutputAsset extends PreRenderedAsset {
+  declare interface OutputAsset extends PreRenderedAsset {
     fileName: string;
     needsCodeReference: boolean;
   }
 
-  interface OutputBundle {
+  declare interface OutputBundle {
     [fileName: string]: OutputAsset | OutputChunk;
   }
 
-  interface OutputChunk extends RenderedChunk {
+  declare interface OutputChunk extends RenderedChunk {
     code: string;
     map: SourceMap | null;
     sourcemapFileName: string | null;
@@ -57637,9 +57720,9 @@ declare module "@iiimaddiniii/js-build-tool" {
    * "commonjs" = CommonJs Module Syntax (cjs).
    * @public
    */
-  export type OutputFormat = "es" | "commonjs";
+  export declare type OutputFormat = "es" | "commonjs";
 
-  interface OutputOptions {
+  declare interface OutputOptions {
     amd?: AmdOptions;
     assetFileNames?: string | ((chunkInfo: PreRenderedAsset) => string);
     banner?: string | AddonFunction;
@@ -57664,6 +57747,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     freeze?: boolean;
     generatedCode?: GeneratedCodePreset | GeneratedCodeOptions;
     globals?: GlobalsOption;
+    hashCharacters?: HashCharacters;
     hoistTransitiveImports?: boolean;
     indent?: string | boolean;
     inlineDynamicImports?: boolean;
@@ -57678,6 +57762,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     plugins?: OutputPluginOption;
     preserveModules?: boolean;
     preserveModulesRoot?: string;
+    reexportProtoFromExternal?: boolean;
     sanitizeFileName?: boolean | ((fileName: string) => string);
     sourcemap?: boolean | 'inline' | 'hidden';
     sourcemapBaseUrl?: string;
@@ -57695,7 +57780,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Options for how to generate
    * @public
    */
-  export interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file" | "declarationTarget" | "declarationSource">> {
+  export declare interface OutputOpts extends Partial<Omit<DefaultOutputOpts, "outputFileName" | "outputFormat" | "file" | "declarationTarget" | "declarationSource">> {
     /**
      * An callback function wich is called for each Output.
      * Used to modify the Output Options before the config is normalized.
@@ -57714,7 +57799,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     outputFormat: OutputFormat;
   }
 
-  interface OutputPlugin
+  declare interface OutputPlugin
     extends Partial<{ [K in OutputPluginHooks]: PluginHooks[K] }>,
     Partial<{ [K in AddonHooks]: ObjectHook<AddonHook> }> {
     cacheKey?: string;
@@ -57722,7 +57807,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     version?: string;
   }
 
-  type OutputPluginHooks =
+  declare type OutputPluginHooks =
     | 'augmentChunkHash'
     | 'generateBundle'
     | 'outputOptions'
@@ -57734,9 +57819,9 @@ declare module "@iiimaddiniii/js-build-tool" {
     | 'resolveImportMeta'
     | 'writeBundle';
 
-  type OutputPluginOption = MaybePromise<OutputPlugin | NullValue | false | OutputPluginOption[]>;
+  declare type OutputPluginOption = MaybePromise<OutputPlugin | NullValue | false | OutputPluginOption[]>;
 
-  enum OutputQuoteStyle {
+  declare enum OutputQuoteStyle {
     PreferDouble = 0,
     AlwaysSingle = 1,
     AlwaysDouble = 2,
@@ -57747,12 +57832,12 @@ declare module "@iiimaddiniii/js-build-tool" {
    * An Array of OutputOpts each defining an bundle wich should be emitted.
    * @public
    */
-  export type OutputsOpts = OutputOpts[];
+  export declare type OutputsOpts = OutputOpts[];
 
   /**
    * Allows to override configuration for files and folders, specified by glob patterns
    */
-  type Overrides = {
+  declare type Overrides = {
     /**
      * Glob pattern for files to apply 'overrides' configuration, relative to the directory of the config file
      */
@@ -57780,7 +57865,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     overrides?: Overrides;
   }[];
 
-  interface OverridesDefinition {
+  declare interface OverridesDefinition {
     /**
      * Provide a list of patterns to override prettier configuration.
      */
@@ -57798,12 +57883,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type PackageExportsEntry = PackageExportsEntryPath | PackageExportsEntryObject;
+  declare type PackageExportsEntry = PackageExportsEntryPath | PackageExportsEntryObject;
 
   /**
    * Used to specify conditional exports, note that Conditional exports are unsupported in older environments, so it's recommended to use the fallback array option if support for those environments is a concern.
    */
-  interface PackageExportsEntryObject {
+  declare interface PackageExportsEntryObject {
     /**
      * The module path that is resolved when this specifier is imported as a CommonJS module using the `require(...)` function.
      */
@@ -57839,7 +57924,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Used to specify conditional exports, note that Conditional exports are unsupported in older environments, so it's recommended to use the fallback array option if support for those environments is a concern.
    */
-  interface PackageExportsEntryObject1 {
+  declare interface PackageExportsEntryObject1 {
     /**
      * The module path that is resolved when this specifier is imported as a CommonJS module using the `require(...)` function.
      */
@@ -57875,23 +57960,23 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * The module path that is resolved when this specifier is imported. Set to `null` to disallow importing this module.
    */
-  type PackageExportsEntryPath = string | null;
+  declare type PackageExportsEntryPath = string | null;
 
   /**
    * Used to allow fallbacks in case this environment doesn't support the preceding entries.
    */
-  type PackageExportsFallback = PackageExportsEntry[];
+  declare type PackageExportsFallback = PackageExportsEntry[];
 
   /**
    * Used to allow fallbacks in case this environment doesn't support the preceding entries.
    */
-  type PackageExportsFallback1 = PackageExportsEntry[];
+  declare type PackageExportsFallback1 = PackageExportsEntry[];
 
   /**
    * The type of a package.json file.
    * @public
    */
-  type PackageJsonSchema = JSONSchemaForNPMPackageJsonFiles;
+  declare type PackageJsonSchema = JSONSchemaForNPMPackageJsonFiles;
 
   /**
    * Takes a variable amount of strings (taskName) and/or functions (fn)
@@ -57903,19 +57988,19 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param tasks - list of tasks.
    * @public
    */
-  const parallel: parallel_2;
+  declare const parallel: parallel_2;
 
-  type ParallelPluginHooks = Exclude<
+  declare type ParallelPluginHooks = Exclude<
     keyof FunctionPluginHooks | AddonHooks,
     FirstPluginHooks | SequentialPluginHooks
   >;
 
-  type ParseAst = (
+  declare type ParseAst = (
     input: string,
     options?: { allowReturnOutsideFunction?: boolean; }
-  ) => AstNode;
+  ) => ProgramNode;
 
-  interface ParseOptions {
+  declare interface ParseOptions {
     bare_returns?: boolean;
     /** @deprecated legacy option. Currently, all supported EcmaScript is valid to parse. */
     ecma?: ECMA;
@@ -57926,7 +58011,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * The JavaScript language options to be supported
    */
-  interface ParserOptions {
+  declare interface ParserOptions {
     ecmaFeatures?: EcmaFeatures;
     /**
      * Set to 3, 5, 6, 7, 8, 9, 10, 11 (default), 12, 13, 14 or "latest" to specify the version of ECMAScript syntax you want to use. You can also set to 2015 (same as 6), 2016 (same as 7), 2017 (same as 8), 2018 (same as 9), 2019 (same as 10), 2020 (same as 11), 2021 (same as 12), 2022 (same as 13) or 2023 (same as 14) to use the year-based naming. "latest" always enables the latest supported ECMAScript version.
@@ -57961,15 +58046,15 @@ declare module "@iiimaddiniii/js-build-tool" {
   }
 
   /** Compiler options set by the plugin user. */
-  type PartialCompilerOptions =
+  declare type PartialCompilerOptions =
     | Partial<FlexibleCompilerOptions>
     | Partial<JsonCompilerOptions>;
 
-  type PartialNull<T> = {
+  declare type PartialNull<T> = {
     [P in keyof T]: T[P] | null;
   };
 
-  interface PartialResolvedId extends Partial<PartialNull<ModuleOptions>> {
+  declare interface PartialResolvedId extends Partial<PartialNull<ModuleOptions>> {
     external?: boolean | 'absolute' | 'relative';
     id: string;
     resolvedBy?: string;
@@ -57978,7 +58063,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * AVA searches your entire project for `*.js`, `*.cjs`, `*.mjs` and `*.ts` files (or other extensions you've configured). It will ignore such files found in the `rewritePaths` targets (e.g. `build/`). If you use more specific paths, for instance `build/main/`, you may need to change AVA's `files` configuration to ignore other directories. Paths are relative to your project directory
    */
-  interface Paths {
+  declare interface Paths {
     /**
      * This interface was referenced by `Paths`'s JSON-Schema definition
      * via the `patternProperty` "/$".
@@ -57991,7 +58076,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Do not make direct changes to the file.
    */
 
-  interface paths {
+  declare interface paths {
     "/": {
       /** Get Hypermedia links to resources accessible in GitHub's REST API */
       get: operations["meta/root"];
@@ -64454,14 +64539,14 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * A person who has been involved in creating or maintaining this package.
    */
-  type Person = {
+  declare type Person = {
     name: string;
     url?: string;
     email?: string;
     [k: string]: unknown | undefined;
   } & Person1;
 
-  type Person1 =
+  declare type Person1 =
     | {
       name: string;
       url?: string;
@@ -64470,19 +64555,19 @@ declare module "@iiimaddiniii/js-build-tool" {
     }
     | string;
 
-  interface Plugin<A = any> extends OutputPlugin, Partial<PluginHooks> {
+  declare interface Plugin<A = any> extends OutputPlugin, Partial<PluginHooks> {
     // for inter-plugin communication
     api?: A;
   }
 
-  interface PluginCache {
+  declare interface PluginCache {
     delete(id: string): boolean;
     get<T = any>(id: string): T;
     has(id: string): boolean;
     set<T = any>(id: string, value: T): void;
   }
 
-  interface PluginContext extends MinimalPluginContext {
+  declare interface PluginContext extends MinimalPluginContext {
     addWatchFile: (id: string) => void;
     cache: PluginCache;
     debug: LoggingFunction;
@@ -64511,12 +64596,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     warn: LoggingFunction;
   }
 
-  interface PluginContextMeta {
+  declare interface PluginContextMeta {
     rollupVersion: string;
     watchMode: boolean;
   }
 
-  type PluginHooks = {
+  declare type PluginHooks = {
     [K in keyof FunctionPluginHooks]: ObjectHook<
       K extends AsyncPluginHooks ? MakeAsync<FunctionPluginHooks[K]> : FunctionPluginHooks[K],
       // eslint-disable-next-line @typescript-eslint/ban-types
@@ -64527,16 +64612,16 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * ESLint supports the use of third-party plugins. Before using the plugin, you have to install it using npm.
    */
-  type Plugins = string[];
+  declare type Plugins = string[];
 
-  namespace plugins {
+  declare namespace plugins {
     export {
       manageDependencies,
       ManageDependenciesConfig
     };
   }
 
-  interface PossibleErrors {
+  declare interface PossibleErrors {
     /**
      * Require or disallow trailing commas
      */
@@ -64691,22 +64776,22 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task
    * @public
    */
-  function prepareWixTools(releaseTag?: string): TaskFunction;
+  declare function prepareWixTools(releaseTag?: string): TaskFunction;
 
   /**
    * Downloads the wixtoolset automatically and adds it to the path, so Electron Forge can use it.
    * @param releaseTag - wich release of the wixtoolset should be downloaded (undefined = latest).
    * @public
    */
-  function prepareWixTools_2(releaseTag?: string): Promise<void>;
+  declare function prepareWixTools_2(releaseTag?: string): Promise<void>;
 
-  interface PreRenderedAsset {
+  declare interface PreRenderedAsset {
     name: string | undefined;
     source: string | Uint8Array;
     type: 'asset';
   }
 
-  interface PreRenderedChunk {
+  declare interface PreRenderedChunk {
     exports: string[];
     facadeModuleId: string | null;
     isDynamicEntry: boolean;
@@ -64717,37 +64802,39 @@ declare module "@iiimaddiniii/js-build-tool" {
     type: 'chunk';
   }
 
-  type PreserveEntrySignaturesOption = false | 'strict' | 'allow-extension' | 'exports-only';
+  declare type PreserveEntrySignaturesOption = false | 'strict' | 'allow-extension' | 'exports-only';
 
   /**
    * A combination of {@link setProd}, {@link selectPnpm} and {@link installDependencies}.
    * Set Production mode and after installing pnpm installing all dependencies.
+   * Pnpm version specified by range in package.json engines.pnpm.
    * Can directly be used as an Rollup Task.
-   * @param version - the version of pnpm to install (default = latest).
    * @returns A Gulp Task.
    * @public
    */
-  function prodSelectPnpmAndInstall(version?: string): TaskFunction;
+  declare function prodInstallDependencies(): TaskFunction;
 
-  interface ProgramTransformerFactory<T extends TransformerStage> {
+  declare type ProgramNode = RollupAstNode<Program>;
+
+  declare interface ProgramTransformerFactory<T extends TransformerStage> {
     type: 'program';
 
-    factory(program: Program): StagedTransformerFactory<T>;
+    factory(program: Program_2): StagedTransformerFactory<T>;
   }
 
   /**
    * node_modules folder inside the project.
    * @public
    */
-  const projectNodeModulesPath: string;
+  declare const projectNodeModulesPath: string;
 
   /**
    * Project folder (current working directory).
    * @public
    */
-  const projectPath: string;
+  declare const projectPath: string;
 
-  interface Property {
+  declare interface Property {
     "property-blacklist"?: ArrayStringRule6;
     "property-case"?: LowerUpperRule3;
     /**
@@ -64801,7 +64888,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns the content of the file.
    * @public
    */
-  function read(relPath: string): Promise<string>;
+  declare function read(relPath: string): Promise<string>;
 
   /**
    * Reads the content of a file in the project as json.
@@ -64809,42 +64896,36 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns the parsed json data.
    * @public
    */
-  function readJson(relPath: string): Promise<any>;
+  declare function readJson(relPath: string): Promise<any>;
 
   /**
    * Reads the contents of a package.json file.
-   * @param path - path to the package.json file.
+   * @param path - path to the package.json file (default = projects package.json file).
+   * @param cache - wether to use a previously cached result (default = true).
    * @returns the Object representing the content of the package.json file.
    * @public
    */
-  function readPackageJson(path: string): Promise<JSONSchemaForNPMPackageJsonFiles>;
+  declare function readPackageJson(path?: string, cache?: boolean): Promise<JSONSchemaForNPMPackageJsonFiles>;
 
-  type RedirectResponseDataType<Responses> = {
+  declare type RedirectResponseDataType<Responses> = {
     [K in RedirectStatuses & keyof Responses]: OctokitResponse<unknown, K>;
   }[RedirectStatuses & keyof Responses];
 
-  type RedirectStatuses = 301 | 302;
+  declare type RedirectStatuses = 301 | 302;
 
   /**
    * Data of one of the Assets.
    * @public
    */
-  type ReleaseAsset = ReleaseAssets[number];
+  declare type ReleaseAsset = ReleaseAssets[number];
 
   /**
    * A list of multiple Assets.
    * @public
    */
-  type ReleaseAssets = Parameters<Required<FetchReleaseOptions>["getAsset"]>[1];
+  declare type ReleaseAssets = Parameters<Required<FetchReleaseOptions>["getAsset"]>[1];
 
-  /**
-   * Reloads the fs module (maybe because it was monkey patched).
-   * @returns the just loaded fs/promises module.
-   * @public
-   */
-  function reloadFs(): typeof promises;
-
-  type RenderChunkHook = (
+  declare type RenderChunkHook = (
     this: PluginContext,
     code: string,
     chunk: RenderedChunk,
@@ -64852,7 +64933,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     meta: { chunks: Record<string, RenderedChunk>; }
   ) => { code: string; map?: SourceMapInput; } | string | NullValue;
 
-  interface RenderedChunk extends PreRenderedChunk {
+  declare interface RenderedChunk extends PreRenderedChunk {
     dynamicImports: string[];
     fileName: string;
     implicitlyLoadedBefore: string[];
@@ -64866,7 +64947,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     referencedFiles: string[];
   }
 
-  interface RenderedModule {
+  declare interface RenderedModule {
     readonly code: string | null;
     originalLength: number;
     removedExports: string[];
@@ -64874,12 +64955,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     renderedLength: number;
   }
 
-  interface RepoInfo {
+  declare interface RepoInfo {
     owner: string;
     repo: string;
   }
 
-  type RequestHeaders = {
+  declare type RequestHeaders = {
     /**
      * Avoid setting `headers.accept`, use `mediaType.{format|previews}` option instead.
      */
@@ -64898,7 +64979,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Parameters that can be passed into `request(route, parameters)` or `endpoint(route, parameters)` methods
    */
-  type RequestParameters = {
+  declare type RequestParameters = {
     /**
      * Base URL to be used when a relative URL is passed, such as `/orgs/{org}`.
      * If `baseUrl` is `https://enterprise.acme-inc.com/api/v3`, then the request
@@ -64941,7 +65022,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Octokit-specific request options which are ignored for the actual request, but can be used by Octokit or plugins to manipulate how the request is sent or how a response is handled
    */
-  type RequestRequestOptions = {
+  declare type RequestRequestOptions = {
     /**
      * Node only. Useful for custom proxy, certificate, or dns lookup.
      *
@@ -64963,32 +65044,32 @@ declare module "@iiimaddiniii/js-build-tool" {
     [option: string]: any;
   };
 
-  type RequiredPreview<T> = T extends string ? {
+  declare type RequiredPreview<T> = T extends string ? {
     mediaType: {
       previews: [T, ...string[]];
     };
   } : {};
 
-  type RequireReturnsDefaultOption = boolean | 'auto' | 'preferred' | 'namespace';
+  declare type RequireReturnsDefaultOption = boolean | 'auto' | 'preferred' | 'namespace';
 
-  interface ResolvedId extends ModuleOptions {
+  declare interface ResolvedId extends ModuleOptions {
     external: boolean | 'absolute';
     id: string;
     resolvedBy: string;
   }
 
-  interface ResolvedIdMap {
+  declare interface ResolvedIdMap {
     [key: string]: ResolvedId;
   }
 
-  type ResolveDynamicImportHook = (
+  declare type ResolveDynamicImportHook = (
     this: PluginContext,
     specifier: string | AstNode,
     importer: string,
     options: { attributes: Record<string, string>; }
   ) => ResolveIdResult;
 
-  type ResolveFileUrlHook = (
+  declare type ResolveFileUrlHook = (
     this: PluginContext,
     options: {
       chunkId: string;
@@ -65000,16 +65081,16 @@ declare module "@iiimaddiniii/js-build-tool" {
     }
   ) => string | NullValue;
 
-  type ResolveIdHook = (
+  declare type ResolveIdHook = (
     this: PluginContext,
     source: string,
     importer: string | undefined,
     options: { attributes: Record<string, string>; custom?: CustomPluginOptions; isEntry: boolean; }
   ) => ResolveIdResult;
 
-  type ResolveIdResult = string | NullValue | false | PartialResolvedId;
+  declare type ResolveIdResult = string | NullValue | false | PartialResolvedId;
 
-  type ResolveImportMetaHook = (
+  declare type ResolveImportMetaHook = (
     this: PluginContext,
     property: string | null,
     options: { chunkId: string; format: InternalModuleFormat; moduleId: string; }
@@ -65021,9 +65102,9 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns
    * @public
    */
-  function resolveModule(module: string): string;
+  declare function resolveModule(module: string): string;
 
-  type ResponseHeaders = {
+  declare type ResponseHeaders = {
     "cache-control"?: string;
     "content-length"?: number;
     "content-type"?: string;
@@ -65044,7 +65125,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [header: string]: string | number | undefined;
   };
 
-  type RestEndpointMethodTypes = {
+  declare type RestEndpointMethodTypes = {
     actions: {
       addCustomLabelsToSelfHostedRunnerForOrg: {
         parameters: RequestParameters & Omit<Endpoints["POST /orgs/{org}/actions/runners/{runner_id}/labels"]["parameters"], "baseUrl" | "headers" | "mediaType">;
@@ -68255,11 +68336,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     };
   };
 
-  type Ro<T> = T extends Array<infer V> ? V[] | Readonly<V[]> | RoArray<V> | Readonly<RoArray<V>> : T extends object ? T | Readonly<T> | RoObject<T> | Readonly<RoObject<T>> : T;
-
-  type RoArray<T> = Ro<T>[];
-
-  namespace rollup {
+  declare namespace rollup {
     export {
       plugins,
       tasks_2 as tasks,
@@ -68274,7 +68351,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   }
   export { rollup, tasks, tools };
 
-  namespace rollup_2 {
+  declare namespace rollup_2 {
     export {
       build_2 as build,
       bundleDeclarations,
@@ -68286,12 +68363,14 @@ declare module "@iiimaddiniii/js-build-tool" {
     };
   }
 
-  interface RollupCache {
+  declare type RollupAstNode<T> = Omit<T, OmittedEstreeKeys> & AstNodeLocation;
+
+  declare interface RollupCache {
     modules: ModuleJSON[];
     plugins?: Record<string, SerializablePluginCache>;
   }
 
-  interface RollupCommonJSOptions {
+  declare interface RollupCommonJSOptions {
     /**
      * A picomatch pattern, or array of patterns, which specifies the files in
      * the build the plugin should operate on. By default, all files with
@@ -68514,13 +68593,13 @@ declare module "@iiimaddiniii/js-build-tool" {
     dynamicRequireRoot?: string;
   }
 
-  interface RollupError extends RollupLog {
+  declare interface RollupError extends RollupLog {
     name?: string;
     stack?: string;
     watchFiles?: string[];
   }
 
-  interface RollupJsonOptions {
+  declare interface RollupJsonOptions {
     /**
      * All JSON files will be parsed by default,
      * but you can also specifically include files
@@ -68554,7 +68633,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     namedExports?: boolean;
   }
 
-  interface RollupLog {
+  declare interface RollupLog {
     binding?: string;
     cause?: unknown;
     code?: string;
@@ -68579,7 +68658,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     url?: string;
   }
 
-  interface RollupNodeResolveOptions {
+  declare interface RollupNodeResolveOptions {
     /**
      * Additional conditions of the package.json exports field to match when resolving modules.
      * By default, this plugin looks for the `'default', 'module', 'import']` conditions when resolving imports.
@@ -68678,14 +68757,14 @@ declare module "@iiimaddiniii/js-build-tool" {
     allowExportsFolderMapping?: boolean;
   }
 
-  interface RollupOptions extends InputOptions {
+  declare interface RollupOptions extends InputOptions {
     // This is included for compatibility with config files but ignored by rollup.rollup
     output?: OutputOptions | OutputOptions[];
   }
 
-  type RollupTypescriptOptions = RollupTypescriptPluginOptions & PartialCompilerOptions;
+  declare type RollupTypescriptOptions = RollupTypescriptPluginOptions & PartialCompilerOptions;
 
-  interface RollupTypescriptPluginOptions {
+  declare interface RollupTypescriptPluginOptions {
     /**
      * If using incremental this is the folder where the cached
      * files will be created and kept for Typescript incremental
@@ -68739,16 +68818,12 @@ declare module "@iiimaddiniii/js-build-tool" {
     noForceEmit?: boolean;
   }
 
-  type RoObject<T> = {
-    [K in keyof T]: T[K] | Ro<T[K]>;
-  };
-
-  interface RootRule {
+  declare interface RootRule {
     "root-no-standard-properties"?: BooleanRule26;
     [k: string]: unknown | undefined;
   }
 
-  interface Rule {
+  declare interface Rule {
     /**
      * Require or disallow an empty line before nested rules
      */
@@ -68899,7 +68974,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * ESLint comes with a large number of rules. You can modify which rules your project uses either using configuration comments or configuration files.
    */
-  type Rules = PossibleErrors &
+  declare type Rules = PossibleErrors &
     BestPractices &
     StrictMode &
     Variables &
@@ -68916,7 +68991,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): TaskFunction;
+  declare function run(rollupOptions: RollupOptions[] | RollupOptions, commandOptions: CommandOptions): TaskFunction;
 
   /**
    * Run Rollup with an custom configuration.
@@ -68924,7 +68999,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param commandOptions - Options wich are normally provided through cli flags.
    * @public
    */
-  function run_2(rollupOptions?: RollupOptions[] | RollupOptions, commandOptions?: CommandOptions): Promise<void>;
+  declare function run_2(rollupOptions?: RollupOptions[] | RollupOptions, commandOptions?: CommandOptions): Promise<void>;
 
   /**
    * Runs the {@link https://api-extractor.com/ | ApiExtractor}.
@@ -68934,7 +69009,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function runApiExtrator(projectPackageJsonPath: string, configObject: IConfigFile): TaskFunction;
+  declare function runApiExtrator(projectPackageJsonPath: string, configObject: IConfigFile): TaskFunction;
 
   /**
    * Runs the {@link https://api-extractor.com/ | ApiExtractor}.
@@ -68942,7 +69017,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param options - the {@link https://api.rushstack.io/pages/api-extractor.iextractorconfigprepareoptions/ | IExtractorConfigPrepareOptions} of the APIExtractor.
    * @public
    */
-  function runApiExtrator_2(projectPackageJsonPath: string, options: IConfigFile): void;
+  declare function runApiExtrator_2(projectPackageJsonPath: string, options: IConfigFile): void;
 
   /**
    * Runs a pnpm script defined in the package.json file.
@@ -68952,7 +69027,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function runScript(script: string, args?: string[]): TaskFunction;
+  declare function runScript(script: string, args?: string[]): TaskFunction;
 
   /**
    * Runs a pnpm script defined in the package.json file.
@@ -68960,7 +69035,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param args - an Array of arguments for the script (default = []).
    * @public
    */
-  function runScript_2(script: string, args?: string[]): Promise<void>;
+  declare function runScript_2(script: string, args?: string[]): Promise<void>;
 
   /**
    * Run the testfiles with jest.
@@ -68969,14 +69044,14 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function runTestFiles(testFiles: string[]): TaskFunction;
+  declare function runTestFiles(testFiles: string[]): TaskFunction;
 
   /**
    * Run the testfiles with jest.
    * @param testFiles - files wich should be executed as tests.
    * @public
    */
-  function runTestFiles_2(testFiles: string[]): Promise<void>;
+  declare function runTestFiles_2(testFiles: string[]): Promise<void>;
 
   /**
    * Runs all testfiles from the jest config.
@@ -68984,13 +69059,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function runTests(): TaskFunction;
+  declare function runTests(): TaskFunction;
 
   /**
    * Runs all testfiles from the jest config.
    * @public
    */
-  function runTests_2(): Promise<void>;
+  declare function runTests_2(): Promise<void>;
 
   /**
    * Runs a script in one specific or all workspaces.
@@ -69001,7 +69076,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function runWorkspaceScript(script: string, filter?: string, args?: string[]): TaskFunction;
+  declare function runWorkspaceScript(script: string, filter?: string, args?: string[]): TaskFunction;
 
   /**
    * Runs a script in one specific or all workspaces.
@@ -69010,7 +69085,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param args - an Array of arguments for the script (default = []).
    * @public
    */
-  function runWorkspaceScript_2(script: string, filter?: string, args?: string[]): Promise<void>;
+  declare function runWorkspaceScript_2(script: string, filter?: string, args?: string[]): Promise<void>;
 
   /**
    * Runs a script in one specific or all workspaces in parallel.
@@ -69021,7 +69096,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function runWorkspaceScriptParallel(script: string, filter?: string, args?: string[]): TaskFunction;
+  declare function runWorkspaceScriptParallel(script: string, filter?: string, args?: string[]): TaskFunction;
 
   /**
    * Runs a script in one specific or all workspaces in parallel.
@@ -69030,67 +69105,59 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param args - an Array of arguments for the script (default = []).
    * @public
    */
-  function runWorkspaceScriptParallel_2(script: string, filter?: string, args?: string[]): Promise<void>;
+  declare function runWorkspaceScriptParallel_2(script: string, filter?: string, args?: string[]): Promise<void>;
 
-  type SchemaForPrettierrc = (OptionsDefinition & OverridesDefinition) | string;
+  declare type SchemaForPrettierrc = (OptionsDefinition & OverridesDefinition) | string;
 
   /**
    * Run AFTER the package is installed.
    */
-  type ScriptsInstallAfter = string;
+  declare type ScriptsInstallAfter = string;
 
   /**
    * Run AFTER the package is published.
    */
-  type ScriptsPublishAfter = string;
+  declare type ScriptsPublishAfter = string;
 
   /**
    * Run by the 'npm restart' command. Note: 'npm restart' will run the stop and start scripts if no restart script is provided.
    */
-  type ScriptsRestart = string;
+  declare type ScriptsRestart = string;
 
   /**
    * Run by the 'npm start' command.
    */
-  type ScriptsStart = string;
+  declare type ScriptsStart = string;
 
   /**
    * Run by the 'npm stop' command.
    */
-  type ScriptsStop = string;
+  declare type ScriptsStop = string;
 
   /**
    * Run by the 'npm test' command.
    */
-  type ScriptsTest = string;
+  declare type ScriptsTest = string;
 
   /**
    * Run BEFORE the package is uninstalled.
    */
-  type ScriptsUninstallBefore = string;
+  declare type ScriptsUninstallBefore = string;
 
   /**
    * Run BEFORE bump the package version.
    */
-  type ScriptsVersionBefore = string;
+  declare type ScriptsVersionBefore = string;
 
-  interface Section {
-    offset: {
-      line: number;
-      column: number;
-    };
-    map: EncodedSourceMap | DecodedSourceMap | SectionedSourceMap;
-  }
+  /**
+   * Install and activate node using the version range specified by package.json engines.pnpm.
+   * If no version is pacified lts is used.
+   * @param version - version string to use (default = package.enginesToUse.node || "lts").
+   * @public
+   */
+  declare function selectNode(version?: string): Promise<void>;
 
-  interface SectionedSourceMap {
-    file?: string | null;
-    sections: Section[];
-    version: 3;
-  }
-
-  type SectionedSourceMapInput = SourceMapInput_2 | Ro<SectionedSourceMap>;
-
-  interface Selector {
+  declare interface Selector {
     "selector-attribute-brackets-space-inside"?: AlwaysNeverRule15;
     "selector-attribute-operator-blacklist"?: ArrayStringRule8;
     "selector-attribute-operator-space-after"?: AlwaysNeverRule16;
@@ -69356,7 +69423,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface SelectorList {
+  declare interface SelectorList {
     "selector-list-comma-newline-after"?: NewlineRule9;
     "selector-list-comma-newline-before"?: NewlineRule10;
     "selector-list-comma-space-after"?: SpaceRule7;
@@ -69364,33 +69431,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  /**
-   * Install and activate pnpm.
-   * Can directly be used as an Rollup Task.
-   * @param version - the version of pnpm to install (default = latest).
-   * @returns A Gulp Task.
-   * @public
-   */
-  function selectPnpm(version?: string): TaskFunction;
-
-  /**
-   * Install and activate PNPM.
-   * @param version  - the version of pnpm to install (default = latest).
-   * @public
-   */
-  function selectPnpm_2(version?: string): Promise<void>;
-
-  /**
-   * A combination of {@link selectPnpm} and {@link installDependencies}.
-   * Installs all dependencies after installing pnpm.
-   * Can directly be used as an Rollup Task.
-   * @param version - the version of pnpm to install (default = latest).
-   * @returns A Gulp Task.
-   * @public
-   */
-  function selectPnpmAndInstall(version?: string): TaskFunction;
-
-  interface SemanticReleaseSchema {
+  declare interface SemanticReleaseSchema {
     /**
      * List of modules or file paths containing a shareable configuration. If multiple shareable configurations are set, they will be imported in the order defined with each configuration option taking precedence over the options defined in a previous shareable configuration
      */
@@ -69422,7 +69463,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type SequentialPluginHooks =
+  declare type SequentialPluginHooks =
     | 'augmentChunkHash'
     | 'generateBundle'
     | 'onLog'
@@ -69431,7 +69472,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     | 'renderChunk'
     | 'transform';
 
-  interface SerializablePluginCache {
+  declare interface SerializablePluginCache {
     [key: string]: [number, any];
   }
 
@@ -69445,7 +69486,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @param tasks - List of tasks.
    * @public
    */
-  const series: series_2;
+  declare const series: series_2;
 
   /**
    * Helper function to set the displayname of minified functions.
@@ -69454,7 +69495,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns the Taskfunktion with the displayName applied.
    * @public
    */
-  function setDisplayName<T extends TaskFunction>(name: string, task: T): T;
+  declare function setDisplayName<T extends TaskFunction>(name: string, task: T): T;
 
   /**
    * Sets the environment to be Production.
@@ -69463,31 +69504,31 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task.
    * @public
    */
-  function setProd(): TaskFunction;
+  declare function setProd(): TaskFunction;
 
   /**
    * Sets the environment to be Production.
    * All Tasks from now run in Production mode.
    * @public
    */
-  function setProd_2(): void;
+  declare function setProd_2(): void;
 
   /**
    * ESLint supports adding shared settings into configuration file. You can add settings object to ESLint configuration file and it will be supplied to every rule that will be executed. This may be useful if you are adding custom rules and want them to have access to the same information and be easily configurable.
    */
-  interface Settings {
+  declare interface Settings {
     [k: string]: unknown | undefined;
   }
 
-  interface ShorthandProperty {
+  declare interface ShorthandProperty {
     "shorthand-property-no-redundant-values"?: BooleanRule34;
     [k: string]: unknown | undefined;
   }
 
-  type ShouldTransformCachedModuleHook = (
+  declare type ShouldTransformCachedModuleHook = (
     this: PluginContext,
     options: {
-      ast: AstNode;
+      ast: ProgramNode;
       code: string;
       id: string;
       meta: CustomPluginOptions;
@@ -69502,7 +69543,7 @@ declare module "@iiimaddiniii/js-build-tool" {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
    */
-  type Signal = any;
+  declare type Signal = any;
 
   /**
    * @minItems 1
@@ -69510,19 +69551,19 @@ declare module "@iiimaddiniii/js-build-tool" {
    * This interface was referenced by `undefined`'s JSON-Schema definition
    * via the `patternProperty` ".*".
    */
-  type SimpleArrayStringRule = [string, ...string[]];
+  declare type SimpleArrayStringRule = [string, ...string[]];
 
   /**
    * Plugins are rules or sets of rules built by the community that support methodologies, toolsets, non-standard CSS features, or very specific use cases
    *
    * @minItems 1
    */
-  type SimpleArrayStringRule1 = [string, ...string[]];
+  declare type SimpleArrayStringRule1 = [string, ...string[]];
 
   /**
    * An identifier mangler for which the output is invariant with respect to the source code.
    */
-  interface SimpleIdentifierMangler {
+  declare interface SimpleIdentifierMangler {
     /**
      * Obtains the nth most favored (usually shortest) identifier to rename a variable to.
      * The mangler will increment n and retry until the return value is not in use in scope, and is not a reserved word.
@@ -69535,19 +69576,19 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Your configuration can extend an existing configuration(s) (whether your own or a third-party config)
    */
-  type SimpleStringOrArrayStringRule = (string | SimpleArrayStringRule) &
+  declare type SimpleStringOrArrayStringRule = (string | SimpleArrayStringRule) &
     (((string | SimpleArrayStringRule) & string) | ((string | SimpleArrayStringRule) & unknown[]));
 
   /**
    * Provide a glob or array of globs to ignore specific files
    */
-  type SimpleStringOrArrayStringRule1 = (string | SimpleArrayStringRule) &
+  declare type SimpleStringOrArrayStringRule1 = (string | SimpleArrayStringRule) &
     (((string | SimpleArrayStringRule) & string) | ((string | SimpleArrayStringRule) & unknown[]));
 
   /**
    * Specify single or double colon notation for applicable pseudo-elements
    */
-  type SingleDoubleRule = (
+  declare type SingleDoubleRule = (
     | null
     | ("single" | "double" | [])
     | [
@@ -69596,7 +69637,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify single or double quotes around strings
    */
-  type SingleDoubleRule1 = (
+  declare type SingleDoubleRule1 = (
     | null
     | ("single" | "double" | [])
     | [
@@ -69642,17 +69683,13 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  type SourceColumn = number;
-
-  interface SourceDescription extends Partial<PartialNull<ModuleOptions>> {
-    ast?: AstNode;
+  declare interface SourceDescription extends Partial<PartialNull<ModuleOptions>> {
+    ast?: ProgramNode;
     code: string;
     map?: SourceMapInput;
   }
 
-  type SourceLine = number;
-
-  interface SourceMap {
+  declare interface SourceMap {
     file: string;
     mappings: string;
     names: string[];
@@ -69663,26 +69700,14 @@ declare module "@iiimaddiniii/js-build-tool" {
     toUrl(): string;
   }
 
-  abstract class SourceMap_2 {
-    version: SourceMapV3['version'];
-    file: SourceMapV3['file'];
-    names: SourceMapV3['names'];
-    sourceRoot: SourceMapV3['sourceRoot'];
-    sources: SourceMapV3['sources'];
-    sourcesContent: SourceMapV3['sourcesContent'];
-    resolvedSources: SourceMapV3['sources'];
-  }
-
-  type SourcemapIgnoreListOption = (
+  declare type SourcemapIgnoreListOption = (
     relativeSourcePath: string,
     sourcemapPath: string
   ) => boolean;
 
-  type SourceMapInput = ExistingRawSourceMap | string | null | { mappings: ''; };
+  declare type SourceMapInput = ExistingRawSourceMap | string | null | { mappings: ''; };
 
-  type SourceMapInput_2 = string | Ro<EncodedSourceMap> | Ro<DecodedSourceMap> | TraceMap;
-
-  interface SourceMapOptions {
+  declare interface SourceMapOptions {
     /** Source map object, 'inline' or source map file content */
     content?: SectionedSourceMapInput | string;
     includeSources?: boolean;
@@ -69692,19 +69717,17 @@ declare module "@iiimaddiniii/js-build-tool" {
     url?: string | 'inline';
   }
 
-  type SourcemapPathTransformOption = (
+  declare type SourcemapPathTransformOption = (
     relativeSourcePath: string,
     sourcemapPath: string
   ) => string;
 
-  type SourceMapSegment =
+  declare type SourceMapSegment =
     | [number]
     | [number, number, number, number]
     | [number, number, number, number, number];
 
-  type SourceMapSegment_2 = [GeneratedColumn] | [GeneratedColumn, SourcesIndex, SourceLine, SourceColumn] | [GeneratedColumn, SourcesIndex, SourceLine, SourceColumn, NamesIndex];
-
-  interface SourcemapsPluginOptions {
+  declare interface SourcemapsPluginOptions {
     include?: Parameters<CreateFilter>[0];
     exclude?: Parameters<CreateFilter>[1];
     readFile?(path: string, callback: (error: Error | null, data: Buffer | string) => void): void;
@@ -69716,23 +69739,12 @@ declare module "@iiimaddiniii/js-build-tool" {
    * "inline" = The sourcemap is inlined in to the bundle.
    * @public
    */
-  export type SourceMapType = "external" | "inline";
-
-  interface SourceMapV3 {
-    file?: string | null;
-    names: string[];
-    sourceRoot?: string;
-    sources: (string | null)[];
-    sourcesContent?: (string | null)[];
-    version: 3;
-  }
-
-  type SourcesIndex = number;
+  export declare type SourceMapType = "external" | "inline";
 
   /**
    * Require a single space or disallow whitespace after the semicolons of declaration blocks
    */
-  type SpaceRule = (
+  declare type SpaceRule = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -69805,7 +69817,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the semicolons of declaration blocks
    */
-  type SpaceRule1 = (
+  declare type SpaceRule1 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -69878,7 +69890,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the commas of value lists
    */
-  type SpaceRule10 = (
+  declare type SpaceRule10 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -69951,7 +69963,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the commas of functions
    */
-  type SpaceRule2 = (
+  declare type SpaceRule2 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70024,7 +70036,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the commas of functions
    */
-  type SpaceRule3 = (
+  declare type SpaceRule3 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70097,7 +70109,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace on the inside of the parentheses of functions
    */
-  type SpaceRule4 = (
+  declare type SpaceRule4 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70170,7 +70182,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the commas of media query lists
    */
-  type SpaceRule5 = (
+  declare type SpaceRule5 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70243,7 +70255,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the commas of media query lists
    */
-  type SpaceRule6 = (
+  declare type SpaceRule6 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70316,7 +70328,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the commas of selector lists
    */
-  type SpaceRule7 = (
+  declare type SpaceRule7 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70389,7 +70401,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace before the commas of selector lists
    */
-  type SpaceRule8 = (
+  declare type SpaceRule8 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70462,7 +70474,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Require a single space or disallow whitespace after the commas of value lists
    */
-  type SpaceRule9 = (
+  declare type SpaceRule9 = (
     | null
     | ("always" | "never" | "always-single-line" | "never-single-line" | [])
     | [
@@ -70532,7 +70544,7 @@ declare module "@iiimaddiniii/js-build-tool" {
         unknown[])
     );
 
-  type StagedTransformerFactory<T extends TransformerStage> = ElementType<CustomTransformers[T]>;
+  declare type StagedTransformerFactory<T extends TransformerStage> = ElementType<CustomTransformers[T]>;
 
   /**
    * Starts the electron app in the current folder (executes "pnpx electron .").
@@ -70540,15 +70552,15 @@ declare module "@iiimaddiniii/js-build-tool" {
    * @returns A Gulp Task
    * @public
    */
-  function start(): TaskFunction;
+  declare function start(): TaskFunction;
 
   /**
    * Starts the electron app in the current folder (executes "pnpx electron .").
    * @public
    */
-  function start_2(): Promise<void>;
+  declare function start_2(): Promise<void>;
 
-  type StdioOption =
+  declare type StdioOption =
     | 'pipe'
     | 'overlapped'
     | 'ipc'
@@ -70558,9 +70570,9 @@ declare module "@iiimaddiniii/js-build-tool" {
     | number
     | undefined;
 
-  type StdoutStderrAll = string | Buffer_2 | undefined;
+  declare type StdoutStderrAll = string | Buffer_2 | undefined;
 
-  interface StrictMode {
+  declare interface StrictMode {
     /**
      * require or disallow strict mode directives
      */
@@ -70568,7 +70580,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface String_2 {
+  declare interface String_2 {
     "string-no-newline"?: BooleanRule35;
     "string-quotes"?: SingleDoubleRule1;
     [k: string]: unknown | undefined;
@@ -70577,7 +70589,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a pattern for custom media query names
    */
-  type StringRule = (
+  declare type StringRule = (
     | (null | string)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & string) | ({} | CoreRule)),
@@ -70614,7 +70626,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a pattern for custom properties
    */
-  type StringRule1 = (
+  declare type StringRule1 = (
     | (null | string)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & string) | ({} | CoreRule)),
@@ -70651,7 +70663,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a pattern for id selectors
    */
-  type StringRule2 = (
+  declare type StringRule2 = (
     | (null | string)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & string) | ({} | CoreRule)),
@@ -70688,7 +70700,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Limit the specificity of selectors
    */
-  type StringRule3 = (
+  declare type StringRule3 = (
     | (null | string)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & string) | ({} | CoreRule)),
@@ -70725,7 +70737,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a pattern for the selectors of rules nested within rules
    */
-  type StringRule4 = (
+  declare type StringRule4 = (
     | (null | string)
     | [
       ({} | CoreRule) & ((({} | CoreRule) & string) | ({} | CoreRule)),
@@ -70762,40 +70774,16 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Create a stubPackages in the temporary directory of the dlx operation.
    * @param options - options for how to create the stubPackage.
+   * @param location - path of the node_modules folder where the Packages can be found (default = node_modules folder of the project).
    * @public
    */
-  function stubPackage(options: StubPackageOptions): Promise<void>;
+  declare function stubPackage(options: StubPackageOptions, location?: string): Promise<void>;
 
   /**
    * Options to create a stubPackage.
    * @public
    */
-  type StubPackageOptions = {
-    /**
-     * Location of the package for wich a stubPackage should be created.
-     */
-    location: string;
-  } & StubProjectPackageOptions;
-
-  /**
-   * Create multiple stubPackages in the temporary directory of the dlx operation.
-   * @param options - array of options for how to create the stubPackage.
-   * @public
-   */
-  function stubPackages(options: StubPackageOptions[]): Promise<void>;
-
-  /**
-   * Creates a stub Package in the temporary directory of the dlx operation, targeting a package prom the project.
-   * @param options - options on how the stubPackage should be created.
-   * @public
-   */
-  function stubProjectPackage(options: StubProjectPackageOptions): Promise<void>;
-
-  /**
-   * Options to create a stubPackage for a project dependency.
-   * @public
-   */
-  type StubProjectPackageOptions = {
+  declare type StubPackageOptions = {
     /**
      * Name of the package which is the destination of the stubPackage.
      */
@@ -70811,7 +70799,15 @@ declare module "@iiimaddiniii/js-build-tool" {
     subpaths?: string[];
   };
 
-  interface StylelintDisableComment {
+  /**
+   * Create multiple stubPackages in the temporary directory of the dlx operation.
+   * @param options - array of options for how to create the stubPackage.
+   * @param location - path of the node_modules folder where the Packages can be found (default = node_modules folder of the project).
+   * @public
+   */
+  declare function stubPackages(options: StubPackageOptions[], location?: string): Promise<void>;
+
+  declare interface StylelintDisableComment {
     /**
      * Require a reason comment before or after `stylelint-disable` comments
      */
@@ -70887,7 +70883,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface StylisticIssues {
+  declare interface StylisticIssues {
     /**
      * Enforce line breaks after opening and before closing array brackets
      */
@@ -71273,13 +71269,13 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type SuccessResponseDataType<Responses> = {
+  declare type SuccessResponseDataType<Responses> = {
     [K in SuccessStatuses & keyof Responses]: GetContentKeyIfPresent<Responses[K]> extends never ? never : OctokitResponse<GetContentKeyIfPresent<Responses[K]>, K>;
   }[SuccessStatuses & keyof Responses];
 
-  type SuccessStatuses = 200 | 201 | 202 | 204;
+  declare type SuccessStatuses = 200 | 201 | 202 | 204;
 
-  type SyncPluginHooks =
+  declare type SyncPluginHooks =
     | 'augmentChunkHash'
     | 'onLog'
     | 'outputOptions'
@@ -71291,15 +71287,13 @@ declare module "@iiimaddiniii/js-build-tool" {
    * Type representing a Gulp Task.
    * @public
    */
-  type TaskFunction = TaskFunction_2;
+  declare type TaskFunction = TaskFunction_2;
 
-  namespace tasks {
+  declare namespace tasks {
     export {
       setProd,
-      selectPnpm,
       installDependencies,
-      selectPnpmAndInstall,
-      prodSelectPnpmAndInstall,
+      prodInstallDependencies,
       cleanWithGit,
       runScript,
       runWorkspaceScript,
@@ -71313,7 +71307,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     };
   }
 
-  namespace tasks_2 {
+  declare namespace tasks_2 {
     export {
       run,
       build,
@@ -71322,31 +71316,32 @@ declare module "@iiimaddiniii/js-build-tool" {
     };
   }
 
-  type TemplateExpression =
+  declare type TemplateExpression =
     | string
     | number
     | ExecaReturnValue<string | Buffer_2>
     | ExecaSyncReturnValue<string | Buffer_2>
     | Array<string | number | ExecaReturnValue<string | Buffer_2> | ExecaSyncReturnValue<string | Buffer_2>>;
 
-  interface Time {
+  declare interface Time {
     "time-no-imperceptible"?: BooleanRule36;
     [k: string]: unknown | undefined;
   }
 
-  type ToOctokitParameters<T> = ExtractParameters<T> & ExtractRequestBody<T>;
+  declare type ToOctokitParameters<T> = ExtractParameters<T> & ExtractRequestBody<T>;
 
-  namespace tools {
+  declare namespace tools {
     export {
       electron_2 as electron,
       rollup_2 as rollup,
       runApiExtrator_2 as runApiExtrator,
       exec,
       exitAfter,
-      reloadFs,
       file,
       read,
       readJson,
+      write,
+      writeJson,
       fs,
       downloadLatestGithubRelease,
       downloadGithubRelease,
@@ -71366,11 +71361,13 @@ declare module "@iiimaddiniii/js-build-tool" {
       runTests_2 as runTests,
       resolveModule,
       readPackageJson,
-      getProjectPackageJson,
-      getProjectTopLevelExports,
-      getProjectDependencies,
-      getProjectDevDependencies,
-      getProjectPackageType,
+      getTopLevelExports,
+      getDependencies,
+      getDevDependencies,
+      getPackageType,
+      getNodeVersionToUse,
+      getPackageVersion,
+      getPackageName,
       PackageJsonSchema,
       findDlxPath,
       findJsBuildToolPath,
@@ -71384,50 +71381,32 @@ declare module "@iiimaddiniii/js-build-tool" {
       jsBuildToolPath,
       nodeModulesPath,
       binPath,
-      selectPnpm_2 as selectPnpm,
+      selectNode,
       installDependencies_2 as installDependencies,
       runScript_2 as runScript,
       runWorkspaceScript_2 as runWorkspaceScript,
       runWorkspaceScriptParallel_2 as runWorkspaceScriptParallel,
-      stubProjectPackage,
       stubPackages,
       stubPackage,
-      StubProjectPackageOptions,
       StubPackageOptions
     };
   }
 
-  class TraceMap implements SourceMap_2 {
-    version: SourceMapV3['version'];
-    file: SourceMapV3['file'];
-    names: SourceMapV3['names'];
-    sourceRoot: SourceMapV3['sourceRoot'];
-    sources: SourceMapV3['sources'];
-    sourcesContent: SourceMapV3['sourcesContent'];
-    resolvedSources: string[];
-    private _encoded;
-    private _decoded;
-    private _decodedMemo;
-    private _bySources;
-    private _bySourceMemos;
-    constructor(map: SourceMapInput_2, mapUrl?: string | null);
-  }
-
-  type TransformerFactory<T extends TransformerStage> =
+  declare type TransformerFactory<T extends TransformerStage> =
     | StagedTransformerFactory<T>
     | ProgramTransformerFactory<T>
     | TypeCheckerTransformerFactory<T>;
 
-  type TransformerStage = keyof CustomTransformers;
+  declare type TransformerStage = keyof CustomTransformers;
 
-  type TransformHook = (
+  declare type TransformHook = (
     this: TransformPluginContext,
     code: string,
     id: string
   ) => TransformResult;
 
-  interface TransformModuleJSON {
-    ast?: AstNode;
+  declare interface TransformModuleJSON {
+    ast?: ProgramNode;
     code: string;
     // note if plugins use new this.cache to opt-out auto transform cache
     customTransformCache: boolean;
@@ -71437,7 +71416,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     transformDependencies: string[];
   }
 
-  interface TransformPluginContext extends PluginContext {
+  declare interface TransformPluginContext extends PluginContext {
     debug: LoggingFunctionWithPosition;
     error: (error: RollupError | string, pos?: number | { column: number; line: number; }) => never;
     getCombinedSourcemap: () => SourceMap;
@@ -71445,25 +71424,25 @@ declare module "@iiimaddiniii/js-build-tool" {
     warn: LoggingFunctionWithPosition;
   }
 
-  type TransformResult = string | NullValue | Partial<SourceDescription>;
+  declare type TransformResult = string | NullValue | Partial<SourceDescription>;
 
-  interface TreeshakingOptions
+  declare interface TreeshakingOptions
     extends Partial<Omit<NormalizedTreeshakingOptions, 'moduleSideEffects'>> {
     moduleSideEffects?: ModuleSideEffectsOption;
     preset?: TreeshakingPreset;
   }
 
-  type TreeshakingPreset = 'smallest' | 'safest' | 'recommended';
+  declare type TreeshakingPreset = 'smallest' | 'safest' | 'recommended';
 
-  interface TypeCheckerTransformerFactory<T extends TransformerStage> {
+  declare interface TypeCheckerTransformerFactory<T extends TransformerStage> {
     type: 'typeChecker';
 
     factory(typeChecker: TypeChecker): StagedTransformerFactory<T>;
   }
 
-  type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+  declare type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
-  interface Unit {
+  declare interface Unit {
     "unit-blacklist"?: UnitRule;
     "unit-case"?: LowerUpperRule7;
     /**
@@ -71513,7 +71492,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a blacklist of disallowed units
    */
-  type UnitRule = (
+  declare type UnitRule = (
     | null
     | (
       | "em"
@@ -74902,7 +74881,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Specify a whitelist of allowed units
    */
-  type UnitRule1 = (
+  declare type UnitRule1 = (
     | null
     | (
       | "em"
@@ -78291,9 +78270,9 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * Relative or absolute URL. Examples: `'/orgs/{org}'`, `https://example.com/foo/bar`
    */
-  type Url = string;
+  declare type Url = string;
 
-  interface Value {
+  declare interface Value {
     /**
      * Specify lowercase or uppercase for keywords values
      */
@@ -78346,7 +78325,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface ValueList {
+  declare interface ValueList {
     "value-list-comma-newline-after"?: NewlineRule11;
     "value-list-comma-newline-before"?: NewlineRule12;
     "value-list-comma-space-after"?: SpaceRule9;
@@ -78355,7 +78334,7 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  interface Variables {
+  declare interface Variables {
     /**
      * Require or disallow initialization in var declarations
      */
@@ -78407,18 +78386,18 @@ declare module "@iiimaddiniii/js-build-tool" {
     [k: string]: unknown | undefined;
   }
 
-  type WarningHandlerWithDefault = (
+  declare type WarningHandlerWithDefault = (
     warning: RollupLog,
     defaultHandler: LoggingFunction
   ) => void;
 
-  type WatchChangeHook = (
+  declare type WatchChangeHook = (
     this: PluginContext,
     id: string,
     change: { event: ChangeEvent; }
   ) => void;
 
-  interface WatcherOptions {
+  declare interface WatcherOptions {
     buildDelay?: number;
     chokidar?: ChokidarOptions;
     clearScreen?: boolean;
@@ -78430,7 +78409,7 @@ declare module "@iiimaddiniii/js-build-tool" {
   /**
    * An identifier mangler that leverages character frequency analysis to determine identifier precedence.
    */
-  interface WeightedIdentifierMangler extends SimpleIdentifierMangler {
+  declare interface WeightedIdentifierMangler extends SimpleIdentifierMangler {
     /**
      * Modifies the internal weighting of the input characters by the specified delta.
      * Will be invoked on the entire printed AST, and then deduct mangleable identifiers.
@@ -78447,6 +78426,27 @@ declare module "@iiimaddiniii/js-build-tool" {
      */
     sort(): void;
   }
+
+  /**
+   * Writes a file in the project.
+   * @param relPath - path to the file relative to the project.
+   * @param data - the string to write to the file.
+   * @returns the content of the file.
+   * @public
+   */
+  declare function write(relPath: string, data: string): Promise<void>;
+
+  /**
+   * Writes the content of a file in the project as json.
+   * @param relPath - path to the file relative to the project.
+   * @param data - the object to stringify and write in to the file.
+   * @param pretty - if the output should be indented with two spaces (default = true).
+   * @returns the parsed json data.
+   * @public
+   */
+  declare function writeJson(relPath: string, data: any, pretty?: boolean): Promise<void>;
+
+
 
 
 }
