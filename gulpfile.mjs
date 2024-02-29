@@ -29,7 +29,7 @@ ${module}
 }
 
 async function synchronizePackageVersion() {
-  const version = tools.getPackageVersion("./node_modules/@iiimaddiniii/js-build-tool/package.json");
+  const version = await tools.getPackageVersion("./node_modules/@iiimaddiniii/js-build-tool/package.json");
   tools.exec`pnpm version ${version}`;
 }
 
