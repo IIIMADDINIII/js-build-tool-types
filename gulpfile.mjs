@@ -46,7 +46,7 @@ export const buildCi = tools.exitAfter(
   tasks.updatePackages(),
   createIndexDts);
 
-export const publish = tools.exitAfter(
+export const publishPackage = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.installDependencies(),
   tasks.updatePackages(),
