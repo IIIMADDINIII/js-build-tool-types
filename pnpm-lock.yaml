@@ -7,21 +7,31 @@ settings:
 dependencies:
   '@types/node':
     specifier: '>=20.8.10'
-    version: 20.8.10
+    version: 20.11.24
   typescript:
     specifier: '>=5.2.2'
-    version: 5.2.2
+    version: 5.3.3
+
+devDependencies:
+  '@iiimaddiniii/js-build-tool':
+    specifier: ^0.6.21
+    version: 0.6.21
 
 packages:
 
-  /@types/node@20.8.10:
-    resolution: {integrity: sha512-TlgT8JntpcbmKUFzjhsyhGfP2fsiz1Mv56im6enJ905xG1DAYesxJaeSbGqQmAw8OWPdhyJGhGSQGKRNJ45u9w==}
+  /@iiimaddiniii/js-build-tool@0.6.21:
+    resolution: {integrity: sha512-nTbUJRshLVwxIxXjb/dhXnbQqIaabOJZ6+W385kt6ZiZMYffme/81kvwQ3zjuPTOyZbA4MRMjIk+UcVaQ/ZOkQ==}
+    hasBin: true
+    dev: true
+
+  /@types/node@20.11.24:
+    resolution: {integrity: sha512-Kza43ewS3xoLgCEpQrsT+xRo/EJej1y0kVYGiLFE1NEODXGzTfwiC6tXTLMQskn1X4/Rjlh0MQUvx9W+L9long==}
     dependencies:
       undici-types: 5.26.5
     dev: false
 
-  /typescript@5.2.2:
-    resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
+  /typescript@5.3.3:
+    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: false
