@@ -14,13 +14,13 @@ dependencies:
 
 devDependencies:
   '@iiimaddiniii/js-build-tool':
-    specifier: ^0.6.21
-    version: 0.6.21
+    specifier: ^0.6.25
+    version: 0.6.25
 
 packages:
 
-  /@iiimaddiniii/js-build-tool@0.6.21:
-    resolution: {integrity: sha512-nTbUJRshLVwxIxXjb/dhXnbQqIaabOJZ6+W385kt6ZiZMYffme/81kvwQ3zjuPTOyZbA4MRMjIk+UcVaQ/ZOkQ==}
+  /@iiimaddiniii/js-build-tool@0.6.25:
+    resolution: {integrity: sha512-X9+pZQf5+gT2KiMEyiSMqP0jzdMkDgzYzrBs2fv7/4EIwaj+scbacAlgNpuNAoS4OOtpXnSQsQ+FE0xXa3882A==}
     hasBin: true
     dev: true
 
