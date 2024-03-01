@@ -1,5 +1,3 @@
-/.rollup.cache/
 /node_modules/
-/dist/
-/tests/
-/tsconfig.tsbuildinfo
+/index.d.ts
+/pnpm-lock.yaml
