@@ -33,23 +33,29 @@ async function synchronizePackageVersion() {
   tools.exec`pnpm version ${version}`;
 }
 
+async function updatePackages() {
+  const pack = await tools.read("package.json");
+  tools.updatePackages();
+  await tools.write("package.json", pack);
+}
+
 export const clean = tools.exitAfter(tasks.cleanWithGit());
 
 export const build = tools.exitAfter(
   tasks.installDependencies(),
-  tasks.updatePackages(),
+  updatePackages,
   createIndexDts);
 
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.installDependencies(),
-  tasks.updatePackages(),
+  updatePackages,
   createIndexDts);
 
 export const publishPackage = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.installDependencies(),
-  tasks.updatePackages(),
+  updatePackages,
   createIndexDts,
   synchronizePackageVersion,
   tasks.publishPackage());
