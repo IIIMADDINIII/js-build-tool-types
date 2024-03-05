@@ -30,7 +30,7 @@ ${module}
 
 async function synchronizePackageVersion() {
   const version = await tools.getPackageVersion("./node_modules/@iiimaddiniii/js-build-tool/package.json");
-  tools.exec`pnpm version ${version}`;
+  await tools.exec`pnpm version ${version}`;
 }
 
 async function updatePackages() {
