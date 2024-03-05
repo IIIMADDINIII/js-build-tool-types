@@ -34,9 +34,7 @@ async function synchronizePackageVersion() {
 }
 
 async function updatePackages() {
-  const pack = await tools.read("package.json");
-  await tools.updatePackages();
-  await tools.write("package.json", pack);
+  await tools.exec`pnpm update --latest`;
 }
 
 export const clean = tools.exitAfter(tasks.cleanWithGit());
@@ -44,12 +42,13 @@ export const clean = tools.exitAfter(tasks.cleanWithGit());
 export const build = tools.exitAfter(
   tasks.installDependencies(),
   updatePackages,
+  tasks.createCommit({ message: "Update Dependencies", all: true }),
   createIndexDts);
 
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.installDependencies(),
-  tasks.updatePackages(),
+  updatePackages,
   tasks.createCommit({ message: "Update Dependencies", all: true }),
   createIndexDts);
 
@@ -57,6 +56,7 @@ export const publishPackage = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.installDependencies(),
   updatePackages,
+  tasks.createCommit({ message: "Update Dependencies", all: true }),
   createIndexDts,
   synchronizePackageVersion,
   tasks.publishPackage());
