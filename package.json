@@ -16,7 +16,7 @@
     "build": "pnpm run gulp build",
     "buildCi": "pnpm run gulp buildCi",
     "publishPackage": "pnpm run gulp publishPackage",
-    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.21 dlx js-build-tool"
+    "gulp": "pnpm --package=@iiimaddiniii/js-build-tool@0.6.32 dlx js-build-tool"
   },
   "homepage": "https://github.com/IIIMADDINIII/js-build-tool-types#readme",
   "main": "",
@@ -26,6 +26,6 @@
     "typescript": ">=5.2.2"
   },
   "devDependencies": {
-    "@iiimaddiniii/js-build-tool": "^0.6.30"
+    "@iiimaddiniii/js-build-tool": "^0.6.32"
   }
 }

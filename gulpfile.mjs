@@ -49,7 +49,8 @@ export const build = tools.exitAfter(
 export const buildCi = tools.exitAfter(
   tasks.cleanWithGit(),
   tasks.installDependencies(),
-  updatePackages,
+  tasks.updatePackages(),
+  tasks.createCommit({ message: "Update Dependencies", all: true }),
   createIndexDts);
 
 export const publishPackage = tools.exitAfter(
