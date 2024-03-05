@@ -35,7 +35,7 @@ async function synchronizePackageVersion() {
 
 async function updatePackages() {
   const pack = await tools.read("package.json");
-  tools.updatePackages();
+  await tools.updatePackages();
   await tools.write("package.json", pack);
 }
 
